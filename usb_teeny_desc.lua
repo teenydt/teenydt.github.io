@@ -200,6 +200,11 @@ SET_RX_CNT(dev, PCD_ENDP$(EP), $(PREFIX)EP$(EP)_RX_SIZE);  \
     fsEpInit = fsEpInit .. genCode({EP = i}, src)
 
 end
+
+if offset > epInfo.maxMem then
+    warning("Memory is too small for FS core, require " .. offset .. " bytes, provide " .. epInfo.maxMem .. " bytes")
+end
+
 r = r .. genCode({TXMAX = txMaxSize, RXMAX = rxMaxSize, FSEPINIT = Ident(fsEpInit, "    ")},[[
 
 // EndPoint max packed sizes
@@ -311,6 +316,7 @@ function Generate_TeenyUSB_header(dev, maxEp, maxMem)
         in_type = "CONTROL",
         out_type = "CONTROL",
     }
+    epInfo.maxMem = maxMem
     local r = ""
     local pwr = (dev.children[1].content.bmAttributes & 0x40) ~= 0 
     pwr = pwr and "USB_CONFIG_SELF_POWERED" or "0"

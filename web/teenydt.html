@@ -38,6 +38,35 @@
 </tr>
 
 <tr>
+    <td>
+        USB Core Type: <select id="mcuSelect" onchange="changeMCU();">
+                <option selected="selected" value="[7,1024]">STM32F0xx</option>
+                <option value="[7,512]">STM32F10x_FS</option>
+                <option value="[4,1280]">STM32F10x_OTG_FS</option>
+                <option value="[4,1280]">STM32F2xx_OTG_FS</option>
+                <option value="[6,4096]">STM32F2xx_OTG_HS</option>
+                <option value="[7,512]">STM32F3xx_BC_FS</option>
+                <option value="[7,512]">STM32F373_XX_FS</option>
+                <option value="[7,1024]">STM32F3xx_DE_FS</option>
+                <option value="[4,1280]">STM32F4xx_OTG_FS</option>
+                <option value="[6,4096]">STM32F4xx_OTG_HS</option>
+                <option value="[6,1280]">STM32F7xx_OTG_FS</option>
+                <option value="[9,4096]">STM32F7xx_OTG_HS</option>
+                <option value="[9,1280]">STM32H7xx_OTG_FS</option>
+                <option value="[9,4096]">STM32H7xx_OTG_HS</option>
+        </select>
+        Max Ep:<input type="text" id="MaxEp" value="7" style="width:20px;" />
+        Max Mem:<input type="text" id="MaxMem" value="1024" style="width:60px;"/>
+    </td>
+    <td>
+
+    </td>
+    <td>
+        File name:<input type="text" id="fileName" value=""  readonly/>
+    </td>
+</tr>
+
+<tr>
 <td>
 <div id="luaDesc">
 return Device {
@@ -107,17 +136,21 @@ return Device {
 </div>
 </td>
 
+</tr>
 
-
-<tr>
 
 </table>
+<p>Log</p>
+<p><textarea id="logInfo" style="width:800px;height:80px;" readonly></textarea></p>
 
 <p>The code editor is <a href="https://ace.c9.io/">ACE</a></p>
 <p>The Lua parser is <a href="https://fengari.io/">fengari</a></p>
 
 
 <script type="application/lua">
+    local js = require("js")
+    local logText = js.global.document:getElementById("logInfo")
+
     require("usb_teeny_desc")
     require("usb_opencm3_desc")
     
@@ -126,9 +159,9 @@ return Device {
         return Generate_TeenyUSB_desc(desc)
     end
     
-    function gen_th(src)
+    function gen_th(src, maxep, maxmem)
         local desc = load(src)()
-        return Generate_TeenyUSB_header(desc, 9, 4096)
+        return Generate_TeenyUSB_header(desc, maxep or 9, maxmem or 4096)
     end
     
     function gen_oc(src)
@@ -136,20 +169,36 @@ return Device {
         return Generate_LibOpenCM3_desc(desc)
     end
     
-    function gen_oh(src)
+    function gen_oh(src, maxep, maxmem)
         local desc = load(src)()
-        return Generate_LibOpenCM3_header(desc, 9, 4096)
+        return Generate_LibOpenCM3_header(desc, maxep or 9, maxmem or 4096)
     end
+    
     
     io = {}
     io.write = function(...)
+        local s = ""
+        local sep = ""
+        for i,v in ipairs({...}) do
+            s = s .. sep .. v
+            sep = " "
+        end
+        logText.value = logText.value .. s
         print(...)
     end
-    
     
 </script>
 
 <script>
+    var logText = document.getElementById("logInfo");
+    function debug(message) {
+        logText.value += message + "\n";
+        logText.scrollTop = logText.scrollHeight;
+    }
+
+    function clearLog() {
+        logText.value = "";
+    }
     var luaEditor = ace.edit("luaDesc",{
         theme: "ace/theme/github",
         mode:  "ace/mode/lua",
@@ -170,18 +219,35 @@ return Device {
         luaEditor.setTheme(t);
         cEditor.setTheme(t);
     }
+
+    function changeMCU(){
+        var t = document.getElementById("mcuSelect").value;
+        var r = JSON.parse(t);
+        document.getElementById("MaxEp").value = r[0];
+        document.getElementById("MaxMem").value = r[1];
+    }
     
     function toTeenyC(){
+        document.getElementById("fileName").value = "teeny_usb_desc.c";
+        clearLog();
         cEditor.setValue( fengari.load('return gen_tc([[' + luaEditor.getValue() + ']])' )()  );
     }
     function toTeenyH(){
-        cEditor.setValue( fengari.load('return gen_th([[' + luaEditor.getValue() + ']])' )()  );
+        document.getElementById("fileName").value = "teeny_usb_init.h";
+        var param = ',' + document.getElementById("MaxEp").value + ',' + document.getElementById("MaxMem").value
+        clearLog();
+        cEditor.setValue( fengari.load('return gen_th([[' + luaEditor.getValue() + ']]'+param+')' )()  );
     }
     function toOpenCM3C(){
+        document.getElementById("fileName").value = "opencm3_usb_init.c";
+        clearLog();
         cEditor.setValue( fengari.load('return gen_oc([[' + luaEditor.getValue() + ']])' )()  );
     }
     function toOpenCM3H(){
-        cEditor.setValue( fengari.load('return gen_oh([[' + luaEditor.getValue() + ']])' )()  );
+        document.getElementById("fileName").value = "opencm3_usb_init.h";
+        var param = ',' + document.getElementById("MaxEp").value + ',' + document.getElementById("MaxMem").value
+        clearLog();
+        cEditor.setValue( fengari.load('return gen_oh([[' + luaEditor.getValue() + ']]'+param+')' )()  );
     }
     
 </script>
