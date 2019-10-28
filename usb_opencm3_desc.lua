@@ -177,7 +177,7 @@ $(BODY)};
             if if_or_iad.content.bDescriptorType == IAD_DESCRIPTOR_TYPE then
                 local ASN = fieldValue(if_or_iad, "bFirstInterface")
                 r = r .. genCode({BODY = Ident(output_desc_filed(if_or_iad), "   "), CFG = CFG, ASN = ASN},[[
-static const struct usb_iface_assoc_descriptor $(PREFIX)conif$(CFG)_assoc$(ASN) = {
+static const struct usb_iface_assoc_descriptor $(PREFIX)config$(CFG)_assoc$(ASN) = {
 $(BODY)};
 ]])
                 for _k, itf in ipairs(if_or_iad.children) do
@@ -187,7 +187,7 @@ $(BODY)};
                     "  {\n    .num_altsetting = 1,\n    .altsetting = &$(PREFIX)config$(CFG)_itf$(IFN),\n")
                     if IFN == ASN then
                         itf_data = itf_data .. genCode({CFG = CFG, ASN = ASN, IFN = IFN},
-                        "    .iface_assoc = &$(PREFIX)conif$(CFG)_assoc$(ASN),\n")
+                        "    .iface_assoc = &$(PREFIX)config$(CFG)_assoc$(ASN),\n")
                     end
                     itf_data = itf_data .. "  },\n"
                 end
