@@ -1,0 +1,189 @@
+<html>
+<head>
+<title>Teeny DT Online</title>
+<style type="text/css" media="screen">
+    #luaDesc { 
+        height: 800px ;
+        width: 600px ;
+    }
+    #result{
+        height: 800px ;
+        width: 900px ;
+    }
+</style>
+
+<script src="fengari-web.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js" integrity="sha256-CVkji/u32aj2TeC+D13f7scFSIfphw2pmu4LaKWMSY8=" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<h1> Teeny DT Online </h1>
+
+<p> A lua based USB descriptor generate tool. Source code on <a href="https://github.com/xtoolbox/teenydt">GitHub</a> </p>
+
+<table border="0">
+<tr>
+<td>
+<h3>Lua format descriptor</h3>
+</td>
+
+<td>
+<h3>==></h3>
+</td>
+
+<td>
+<h3>C Code</h3>
+</td>
+
+</tr>
+
+<tr>
+<td>
+<div id="luaDesc">
+return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB Composite DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "COMP",
+    Config {
+        USB_HID{
+            ReadEp = EndPoint(IN(2),  Interrupt, 16),
+            WriteEp = EndPoint(OUT(2), Interrupt, 16),
+            report = HID_InOut(16),
+        },
+        CDC_ACM{
+            EndPoint(IN(8),  Interrupt, 16),
+            EndPoint(IN(1), BulkDouble, 32),
+            EndPoint(OUT(1),  BulkDouble, 32),
+        },
+        Interface{
+            WCID=WinUSB,
+            strInterface = "TeenyUSB WinUSB",
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(3),  BulkDouble, 32),
+            EndPoint(OUT(3), BulkDouble, 32),
+        },
+        Interface{
+            bInterfaceClass = 0x08,        -- MSC
+            bInterfaceSubClass = 0x06,     -- SCSI
+            bInterfaceProtocol = 0x50,     -- BOT
+            EndPoint(IN(4),  BulkDouble, 64),
+            EndPoint(OUT(4), BulkDouble, 64),
+        },
+   }
+}
+</div>
+
+</td>
+
+<td>
+<p>
+<button id="idTeenyC" onClick="toTeenyC();">TeenyUSB C</button>
+</p>
+
+<p>
+<button id="idTeenyH" onClick="toTeenyH();">TeenyUSB H</button>
+</p>
+<p>
+<button id="idOpenCM3C" onClick="toOpenCM3C();">OpenCM3 C</button>
+</p>
+
+<p>
+<button id="idOpenCM3H" onClick="toOpenCM3H();">OpenCM3 H</button>
+</p>
+
+<p>Code Style<p/>
+
+<p>
+<select id="theme" onchange="changeTheme();"><optgroup label="Bright"><option value="ace/theme/chrome">Chrome</option><option value="ace/theme/clouds">Clouds</option><option value="ace/theme/crimson_editor">Crimson Editor</option><option value="ace/theme/dawn">Dawn</option><option value="ace/theme/dreamweaver">Dreamweaver</option><option value="ace/theme/eclipse">Eclipse</option><option value="ace/theme/github">GitHub</option><option value="ace/theme/iplastic">IPlastic</option><option value="ace/theme/solarized_light">Solarized Light</option><option value="ace/theme/textmate">TextMate</option><option value="ace/theme/tomorrow">Tomorrow</option><option value="ace/theme/xcode">XCode</option><option value="ace/theme/kuroir">Kuroir</option><option value="ace/theme/katzenmilch">KatzenMilch</option><option value="ace/theme/sqlserver">SQL Server</option></optgroup><optgroup label="Dark"><option value="ace/theme/ambiance">Ambiance</option><option value="ace/theme/chaos">Chaos</option><option value="ace/theme/clouds_midnight">Clouds Midnight</option><option value="ace/theme/dracula">Dracula</option><option value="ace/theme/cobalt">Cobalt</option><option value="ace/theme/gruvbox">Gruvbox</option><option value="ace/theme/gob">Green on Black</option><option value="ace/theme/idle_fingers">idle Fingers</option><option value="ace/theme/kr_theme">krTheme</option><option value="ace/theme/merbivore">Merbivore</option><option value="ace/theme/merbivore_soft">Merbivore Soft</option><option value="ace/theme/mono_industrial">Mono Industrial</option><option value="ace/theme/monokai">Monokai</option><option value="ace/theme/pastel_on_dark">Pastel on dark</option><option value="ace/theme/solarized_dark">Solarized Dark</option><option value="ace/theme/terminal">Terminal</option><option value="ace/theme/tomorrow_night">Tomorrow Night</option><option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option><option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option><option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option><option value="ace/theme/twilight">Twilight</option><option value="ace/theme/vibrant_ink">Vibrant Ink</option></optgroup></select>
+</p>
+
+</td>
+
+<td>
+<div id="result">
+</div>
+</td>
+
+
+
+<tr>
+
+</table>
+
+<p>The code editor is <a href="https://ace.c9.io/">ACE</a></p>
+<p>The Lua parser is <a href="https://fengari.io/">fengari</a></p>
+
+
+<script type="application/lua">
+    require("usb_teeny_desc")
+    require("usb_opencm3_desc")
+    
+    function gen_tc(src)
+        local desc = load(src)()
+        return Generate_TeenyUSB_desc(desc)
+    end
+    
+    function gen_th(src)
+        local desc = load(src)()
+        return Generate_TeenyUSB_header(desc, 9, 4096)
+    end
+    
+    function gen_oc(src)
+        local desc = load(src)()
+        return Generate_LibOpenCM3_desc(desc)
+    end
+    
+    function gen_oh(src)
+        local desc = load(src)()
+        return Generate_LibOpenCM3_header(desc, 9, 4096)
+    end
+    
+    io = {}
+    io.write = function(...)
+        print(...)
+    end
+    
+    
+</script>
+
+<script>
+    var luaEditor = ace.edit("luaDesc",{
+        theme: "ace/theme/github",
+        mode:  "ace/mode/lua",
+        maxLines: 50,
+        minLines: 50,
+    });
+    
+    var cEditor = ace.edit("result", {
+        theme: "ace/theme/github",
+        mode:  "ace/mode/c_cpp",
+        maxLines: 50,
+        minLines: 50,
+    });
+    
+    document.getElementById("theme").value = "ace/theme/github";
+    function changeTheme(){
+        var t = document.getElementById("theme").value;
+        luaEditor.setTheme(t);
+        cEditor.setTheme(t);
+    }
+    
+    function toTeenyC(){
+        cEditor.setValue( fengari.load('return gen_tc([[' + luaEditor.getValue() + ']])' )()  );
+    }
+    function toTeenyH(){
+        cEditor.setValue( fengari.load('return gen_th([[' + luaEditor.getValue() + ']])' )()  );
+    }
+    function toOpenCM3C(){
+        cEditor.setValue( fengari.load('return gen_oc([[' + luaEditor.getValue() + ']])' )()  );
+    }
+    function toOpenCM3H(){
+        cEditor.setValue( fengari.load('return gen_oh([[' + luaEditor.getValue() + ']])' )()  );
+    }
+    
+</script>
+</body>
+</html>
