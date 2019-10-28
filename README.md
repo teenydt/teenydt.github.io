@@ -4,6 +4,8 @@ TeenyDT
 
 lua based USB descriptor generator for TeenyUSB and LibOpenCM3.
 
+[在线试用](http://dt.tusb.org)。 [Try it online](http://dt.tusb.org).
+
 需要[lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)，require [lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)
 
 ## 生成描述符
