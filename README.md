@@ -8,6 +8,8 @@ lua based USB descriptor generator for TeenyUSB and LibOpenCM3.
 
 需要[lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)，require [lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)
 
+老版本带UI和驱动生成的TeenyDT在[这里](https://github.com/xtoolbox/archive_TeenyUSB/tree/master/TeenyDT)，Old TeenyDT with GUI and driver generator is moved to [here](https://github.com/xtoolbox/archive_TeenyUSB/tree/master/TeenyDT).
+
 ## 生成描述符
 ```shell
 lua gen_descriptor.lua <lua_desc_path> [-maxep=7] [-maxmem=512] [-mode=opencm3]
