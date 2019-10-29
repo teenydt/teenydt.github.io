@@ -115,6 +115,7 @@ local function init_ep_for_fs_core(dev, epInfo)
 local offset = 0
 local txMaxSize = ""
 local rxMaxSize = ""
+local epMaxSizeType = "uint8_t"
 local fsEpInit = ""
 for i=0,epInfo.maxUsedEp do
     local ep = epInfo[i]
@@ -161,6 +162,8 @@ for i=0,epInfo.maxUsedEp do
     offset = offset + (ep.out_size or 0)*mul + (ep.in_size or 0)*mul
     txMaxSize = txMaxSize .. (ep.in_size and genCode({EP=i}, "$(PREFIX)EP$(EP)_TX_SIZE, ") or "0, ")
     rxMaxSize = rxMaxSize .. (ep.out_size and genCode({EP=i}, "$(PREFIX)EP$(EP)_RX_SIZE, ") or "0, ")
+    if ep.in_size and ep.in_size > 255 then epMaxSizeType = "uint16_t" end
+    if ep.out_size and ep.out_size > 255 then epMaxSizeType = "uint16_t" end
 
     local src = "/* Init ep$(EP) */ \\\n"
 
@@ -205,16 +208,16 @@ if offset > epInfo.maxMem then
     warning("Memory is too small for FS core, require " .. offset .. " bytes, provide " .. epInfo.maxMem .. " bytes")
 end
 
-r = r .. genCode({TXMAX = txMaxSize, RXMAX = rxMaxSize, FSEPINIT = Ident(fsEpInit, "    ")},[[
+r = r .. genCode({TXMAX = txMaxSize, RXMAX = rxMaxSize, SIZET=epMaxSizeType, FSEPINIT = Ident(fsEpInit, "    ")},[[
 
 // EndPoint max packed sizes
-extern const uint8_t $(PREFIX)txEpMaxSize[];
+extern const $(SIZET) $(PREFIX)txEpMaxSize[];
 #define $(PREFIX)TXEP_MAX_SIZE                                  \
-const uint8_t $(PREFIX)txEpMaxSize[] = \
+const $(SIZET) $(PREFIX)txEpMaxSize[] = \
 { $(TXMAX) };
-extern const uint8_t $(PREFIX)rxEpMaxSize[];
+extern const $(SIZET) $(PREFIX)rxEpMaxSize[];
 #define $(PREFIX)RXEP_MAX_SIZE                                  \
-const uint8_t $(PREFIX)rxEpMaxSize[] = \
+const $(SIZET) $(PREFIX)rxEpMaxSize[] = \
 { $(RXMAX) };
 
 // EndPoints init function for USB FS core
@@ -329,8 +332,8 @@ function Generate_TeenyUSB_header(dev, maxEp, maxMem)
         MAXEP = epInfo.maxUsedEp,
         STATUS =  pwr .. " | " .. rmt,
     }, [[
-#ifndef __TEENY_USB_INIT_H__
-#define __TEENY_USB_INIT_H__
+#ifndef __$(PREFIX)TEENY_USB_INIT_H__
+#define __$(PREFIX)TEENY_USB_INIT_H__
 // forward declare the tusb_descriptors struct
 typedef struct _tusb_descriptors tusb_descriptors;
 
@@ -456,7 +459,7 @@ extern const uint8_t WCID_StringDescriptor_MSOS[];
 
 ]])
     end
-    r = r .. "\n#endif   // #ifndef __TEENY_USB_INIT_H__\n"
+    r = r .. genCode({},"\n#endif   // #ifndef __$(PREFIX)TEENY_USB_INIT_H__\n")
     return r
 end
 
