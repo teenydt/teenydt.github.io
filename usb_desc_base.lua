@@ -157,6 +157,12 @@ function Interface(param)
     if param.WCID then
         desc.extDesc = appendExt(desc.extDesc, param.WCID(param.GUID))
     end
+    for i,v in ipairs(param) do
+        if v.extDesc then
+            desc.extDesc = appendExt(desc.extDesc, v.extDesc)
+        end
+    end
+    
     for i,v in ipairs(desc.extDesc) do
         v.interface = desc
     end

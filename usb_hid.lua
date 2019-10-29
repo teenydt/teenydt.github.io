@@ -37,6 +37,7 @@ require("usb_desc_base")
 function HIDDescriptor(param)
     local varData = {}
     local numDesc = #param
+    local extDesc = {}
     for i,v in ipairs(param) do
         local t = {}
         t["bDescriptorType"..i] = 0x22
@@ -44,6 +45,7 @@ function HIDDescriptor(param)
         t = {}
         t["wDescriptorLength"..i] = #v.data
         varData[#varData+1] = t
+        extDesc = appendExt(extDesc, v)
     end
     
     local desc = CreateDescriptor({
@@ -53,7 +55,7 @@ function HIDDescriptor(param)
         {bCountryCode         = 0                            },
         {bNumDescriptors      = numDesc                      },
     }, {varData = varData}, "hid descriptor")
-    
+    desc.extDesc = extDesc
     return desc
 end
 
@@ -203,16 +205,12 @@ function USB_HID(param)
     ext = appendExt(ext, param.report)
     ext = appendExt(ext, param.physical)
     local Hid = Interface{
-        bInterfaceClass = 3,
-        bInterfaceSubClass = param.isBoot and 1 or 0,
-        bInterfaceProtocol = param.isKey and 1 or (param.isMouse and 2 or 0),
-        HIDDescriptor{
-            param.report,
-            param.physical,
-        },
+        bInterfaceClass = param.bInterfaceClass or 3,
+        bInterfaceSubClass = param.bInterfaceSubClass or (param.isBoot and 1 or 0),
+        bInterfaceProtocol = param.bInterfaceProtocol or (param.isKey and 1 or (param.isMouse and 2 or 0)),
+        HIDDescriptor(ext),
         ReadEp,
         WriteEp,
-        extDesc = ext
     }
     return Hid
 end

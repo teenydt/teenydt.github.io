@@ -107,7 +107,7 @@ MAX_EP = tonumber(opts.maxep) or MAX_EP
 MAX_MEM = tonumber(opts.maxmem) or MAX_MEM
 local mode = opts.mode
 
-print(tostring(mode))
+--print(tostring(mode))
 
 local f = io.open(arg[1], "r")
 assert(f,"Fail to open <"..arg[1]..">")
