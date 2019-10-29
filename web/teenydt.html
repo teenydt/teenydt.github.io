@@ -254,24 +254,24 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
     function toTeenyC(){
         document.getElementById("fileName").value = "teeny_usb_desc.c";
         clearLog();
-        cEditor.setValue( fengari.load('return gen_tc([[' + luaEditor.getValue() + ']])' )()  );
+        cEditor.setValue( fengari.load('return gen_tc([==[' + luaEditor.getValue() + ']==])' )()  );
     }
     function toTeenyH(){
         document.getElementById("fileName").value = "teeny_usb_init.h";
         var param = ',' + document.getElementById("MaxEp").value + ',' + document.getElementById("MaxMem").value
         clearLog();
-        cEditor.setValue( fengari.load('return gen_th([[' + luaEditor.getValue() + ']]'+param+')' )()  );
+        cEditor.setValue( fengari.load('return gen_th([==[' + luaEditor.getValue() + ']==]'+param+')' )()  );
     }
     function toOpenCM3C(){
         document.getElementById("fileName").value = "opencm3_usb_init.c";
         clearLog();
-        cEditor.setValue( fengari.load('return gen_oc([[' + luaEditor.getValue() + ']])' )()  );
+        cEditor.setValue( fengari.load('return gen_oc([==[' + luaEditor.getValue() + ']==])' )()  );
     }
     function toOpenCM3H(){
         document.getElementById("fileName").value = "opencm3_usb_init.h";
         var param = ',' + document.getElementById("MaxEp").value + ',' + document.getElementById("MaxMem").value
         clearLog();
-        cEditor.setValue( fengari.load('return gen_oh([[' + luaEditor.getValue() + ']]'+param+')' )()  );
+        cEditor.setValue( fengari.load('return gen_oh([==[' + luaEditor.getValue() + ']==]'+param+')' )()  );
     }
     
     var saveData = (function () {
