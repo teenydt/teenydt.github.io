@@ -1,7 +1,7 @@
 /*
  * Name   :  teeny_usb_init.h
  * Author :  admin@xtoolbox.org
- * Date   :  2019-10-29 11:53:02
+ * Date   :  2019-10-29 15:19:13
 
  * Desc   :  This file is auto generate by the TeenyDT
  *           Visit https://github.com/xtoolbox/TeenyDT for more info
@@ -29,6 +29,9 @@ return {
     require("hid_user_desc"),
     require("hid_kb_desc"),
     require("hid_mouse_desc"),
+    require("msc_desc"),
+    require("daplinkv1_desc"),
+    require("daplinkv2_desc"),
 }
 
 
@@ -2209,6 +2212,750 @@ extern const tusb_descriptors MOUSE_descriptors;
 
 #define MOUSE_REPORT_DESCRIPTOR_SIZE_IF0  (50)
 extern const uint8_t MOUSE_ReportDescriptor_if0[MOUSE_REPORT_DESCRIPTOR_SIZE_IF0];
+
+
+#endif   // #ifndef __TEENY_USB_INIT_H__
+/////////////////////////////////////////
+//// Device 8
+/////////////////////////////////////////
+#ifndef __TEENY_USB_INIT_H__
+#define __TEENY_USB_INIT_H__
+// forward declare the tusb_descriptors struct
+typedef struct _tusb_descriptors tusb_descriptors;
+
+#define MSC_VID                                            0x0483
+#define MSC_PID                                            0x0011
+#define MSC_STRING_COUNT                                   (4)
+
+// device.bmAttributes & 0x40   USB_CONFIG_SELF_POWERED
+// device.bmAttributes & 0x20   USB_CONFIG_REMOTE_WAKEUP
+#define MSC_DEV_STATUS                                    (0 | 0)
+
+
+// Endpoint usage:
+#define MSC_MAX_EP                                         (2)
+#define MSC_EP_NUM                                         (MSC_MAX_EP + 1)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 FS Core
+///////////////////////////////////////////////
+
+#ifdef MSC_BTABLE_ADDRESS
+#undef MSC_BTABLE_ADDRESS
+#endif
+#define MSC_BTABLE_ADDRESS                                 (0)
+#define MSC_EP_BUF_DESC_TABLE_SIZE                         (8)
+// PMA buffer reserved for buffer description table
+#define MSC_USB_BUF_START                                  (MSC_EP_BUF_DESC_TABLE_SIZE * MSC_EP_NUM)
+
+// EndPoints 0 defines
+#define MSC_EP0_RX_SIZE                                    (64)
+#define MSC_EP0_RX_ADDR                                    (MSC_USB_BUF_START + (0))
+#define MSC_EP0_TX_SIZE                                    (64)
+#define MSC_EP0_TX_ADDR                                    (MSC_USB_BUF_START + (64))
+#define MSC_EP0_RX_TYPE                                    USB_EP_CONTROL
+#define MSC_EP0_TX_TYPE                                    USB_EP_CONTROL
+
+#define MSC_EP0_TYPE                                       USB_EP_CONTROL
+#define MSC_EP0_TX0_ADDR                                   (MSC_USB_BUF_START + (0))
+#define MSC_EP0_TX1_ADDR                                   (MSC_USB_BUF_START + (64))
+#define MSC_EP0_RX0_ADDR                                   (MSC_USB_BUF_START + (0))
+#define MSC_EP0_RX1_ADDR                                   (MSC_USB_BUF_START + (64))
+
+// EndPoints 1 defines
+#define MSC_EP1_RX_SIZE                                    (0)
+#define MSC_EP1_RX_ADDR                                    (MSC_USB_BUF_START + (128))
+#define MSC_EP1_TX_SIZE                                    (64)
+#define MSC_EP1_TX_ADDR                                    (MSC_USB_BUF_START + (128))
+#define MSC_EP1_RX_TYPE                                    USB_EP_Invalid
+#define MSC_EP1_TX_TYPE                                    USB_EP_BULK
+
+#define MSC_EP1_TYPE                                       USB_EP_BULK
+#define MSC_EP1_TX0_ADDR                                   (MSC_USB_BUF_START + (128))
+#define MSC_EP1_TX1_ADDR                                   (MSC_USB_BUF_START + (192))
+#define MSC_EP1_RX0_ADDR                                   (MSC_USB_BUF_START + (128))
+#define MSC_EP1_RX1_ADDR                                   (MSC_USB_BUF_START + (192))
+
+// EndPoints 2 defines
+#define MSC_EP2_RX_SIZE                                    (64)
+#define MSC_EP2_RX_ADDR                                    (MSC_USB_BUF_START + (256))
+#define MSC_EP2_TX_SIZE                                    (0)
+#define MSC_EP2_TX_ADDR                                    (MSC_USB_BUF_START + (320))
+#define MSC_EP2_RX_TYPE                                    USB_EP_BULK
+#define MSC_EP2_TX_TYPE                                    USB_EP_Invalid
+
+#define MSC_EP2_TYPE                                       USB_EP_BULK
+#define MSC_EP2_TX0_ADDR                                   (MSC_USB_BUF_START + (256))
+#define MSC_EP2_TX1_ADDR                                   (MSC_USB_BUF_START + (320))
+#define MSC_EP2_RX0_ADDR                                   (MSC_USB_BUF_START + (256))
+#define MSC_EP2_RX1_ADDR                                   (MSC_USB_BUF_START + (320))
+
+
+// EndPoint max packed sizes
+extern const uint8_t MSC_txEpMaxSize[];
+#define MSC_TXEP_MAX_SIZE                                  \
+const uint8_t MSC_txEpMaxSize[] = \
+{ MSC_EP0_TX_SIZE, MSC_EP1_TX_SIZE, 0,  };
+extern const uint8_t MSC_rxEpMaxSize[];
+#define MSC_RXEP_MAX_SIZE                                  \
+const uint8_t MSC_rxEpMaxSize[] = \
+{ MSC_EP0_RX_SIZE, 0, MSC_EP2_RX_SIZE,  };
+
+// EndPoints init function for USB FS core
+#define MSC_TUSB_INIT_EP_FS(dev) \
+  do{\
+    /* Init ep0 */ \
+    INIT_EP_BiDirection(dev, PCD_ENDP0, MSC_EP0_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP0, MSC_EP0_TX_ADDR);  \
+    SET_RX_ADDR(dev, PCD_ENDP0, MSC_EP0_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP0, MSC_EP0_RX_SIZE);  \
+    /* Init ep1 */ \
+    INIT_EP_TxDouble(dev, PCD_ENDP1, MSC_EP1_TYPE);     \
+    SET_DOUBLE_ADDR(dev, PCD_ENDP1, MSC_EP1_TX0_ADDR, MSC_EP1_TX1_ADDR);  \
+    SET_DBL_TX_CNT(dev, PCD_ENDP1, 0);     \
+    /* Init ep2 */ \
+    INIT_EP_RxDouble(dev, PCD_ENDP2, MSC_EP2_TYPE);     \
+    SET_DOUBLE_ADDR(dev, PCD_ENDP2, MSC_EP2_RX0_ADDR, MSC_EP2_RX1_ADDR);  \
+    SET_DBL_RX_CNT(dev, PCD_ENDP2, MSC_EP2_RX_SIZE);     \
+}while(0)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG Core
+///////////////////////////////////////////////
+#define MSC_OTG_MAX_OUT_SIZE                               (64)
+#define MSC_OTG_CONTROL_EP_NUM                             (1)
+#define MSC_OTG_OUT_EP_NUM                                 (1)
+// RX FIFO size / 4 > (CONTROL_EP_NUM * 5 + 8) +  (MAX_OUT_SIZE / 4 + 1) + (OUT_EP_NUM*2) + 1 = 33
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG FS Core
+///////////////////////////////////////////////
+#define MSC_OTG_RX_FIFO_SIZE_FS                            (256)
+#define MSC_OTG_RX_FIFO_ADDR_FS                            (0)
+// Sum of IN ep max packet size is 128
+// Remain Fifo size is 1024 in bytes, Rx Used 256 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define MSC_EP0_TX_FIFO_ADDR_FS                            (256)
+#define MSC_EP0_TX_FIFO_SIZE_FS                            (MSC_EP0_TX_SIZE * 7)
+#define MSC_EP1_TX_FIFO_ADDR_FS                            (704)
+#define MSC_EP1_TX_FIFO_SIZE_FS                            (MSC_EP1_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_FS)
+#define MSC_TUSB_INIT_EP_OTG_FS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_FS) { \
+      SET_RX_FIFO(dev, MSC_OTG_RX_FIFO_ADDR_FS, MSC_OTG_RX_FIFO_SIZE_FS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, MSC_EP0_TX_TYPE, MSC_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, MSC_EP0_TX_FIFO_ADDR_FS, MSC_EP0_TX_FIFO_SIZE_FS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, MSC_EP0_RX_TYPE, MSC_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Tx(dev, PCD_ENDP1, MSC_EP1_TX_TYPE, MSC_EP1_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP1, MSC_EP1_TX_FIFO_ADDR_FS, MSC_EP1_TX_FIFO_SIZE_FS);  \
+      /* Init Ep2  */\
+      INIT_EP_Rx(dev, PCD_ENDP2, MSC_EP2_RX_TYPE, MSC_EP2_RX_SIZE); \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_FS)
+#define MSC_TUSB_INIT_EP_OTG_FS(dev) 
+    
+#endif  // #if defined(USB_OTG_FS)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG HS Core
+///////////////////////////////////////////////
+#define MSC_OTG_RX_FIFO_SIZE_HS                            (512)
+#define MSC_OTG_RX_FIFO_ADDR_HS                            (0)
+// Sum of IN ep max packet size is 128
+// Remain Fifo size is 3584 in bytes, Rx Used 512 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define MSC_EP0_TX_FIFO_ADDR_HS                            (512)
+#define MSC_EP0_TX_FIFO_SIZE_HS                            (MSC_EP0_TX_SIZE * 7)
+#define MSC_EP1_TX_FIFO_ADDR_HS                            (960)
+#define MSC_EP1_TX_FIFO_SIZE_HS                            (MSC_EP1_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_HS)
+#define MSC_TUSB_INIT_EP_OTG_HS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_HS) { \
+      SET_RX_FIFO(dev, MSC_OTG_RX_FIFO_ADDR_HS, MSC_OTG_RX_FIFO_SIZE_HS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, MSC_EP0_TX_TYPE, MSC_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, MSC_EP0_TX_FIFO_ADDR_HS, MSC_EP0_TX_FIFO_SIZE_HS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, MSC_EP0_RX_TYPE, MSC_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Tx(dev, PCD_ENDP1, MSC_EP1_TX_TYPE, MSC_EP1_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP1, MSC_EP1_TX_FIFO_ADDR_HS, MSC_EP1_TX_FIFO_SIZE_HS);  \
+      /* Init Ep2  */\
+      INIT_EP_Rx(dev, PCD_ENDP2, MSC_EP2_RX_TYPE, MSC_EP2_RX_SIZE); \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_HS)
+#define MSC_TUSB_INIT_EP_OTG_HS(dev) 
+    
+#endif  // #if defined(USB_OTG_HS)
+#define MSC_TUSB_INIT_EP_OTG(dev) \
+  do{\
+    MSC_TUSB_INIT_EP_OTG_FS(dev); \
+    MSC_TUSB_INIT_EP_OTG_HS(dev); \
+  }while(0)
+
+
+#if defined(USB)
+#define MSC_TUSB_INIT_EP(dev) MSC_TUSB_INIT_EP_FS(dev)
+
+// Teeny USB device init function for FS core
+#define MSC_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = MSC_DEV_STATUS;         \
+    dev->rx_max_size = MSC_rxEpMaxSize;         \
+    dev->tx_max_size = MSC_txEpMaxSize;         \
+    dev->descriptors = &MSC_descriptors;         \
+  }while(0)
+
+#endif
+
+#if defined(USB_OTG_FS) || defined(USB_OTG_HS)
+#define MSC_TUSB_INIT_EP(dev) MSC_TUSB_INIT_EP_OTG(dev)
+
+// Teeny USB device init function for OTG core
+#define MSC_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = MSC_DEV_STATUS;         \
+    dev->descriptors = &MSC_descriptors;         \
+  }while(0)
+
+#endif
+
+#define MSC_TUSB_INIT(dev) \
+  do{\
+    MSC_TUSB_INIT_EP(dev);   \
+    MSC_TUSB_INIT_DEVICE(dev);   \
+  }while(0)
+
+// Get End Point count
+#ifndef  EP_NUM
+#define  EP_NUM 1
+#endif
+#if MSC_EP_NUM > EP_NUM
+#undef   EP_NUM
+#define  EP_NUM  MSC_EP_NUM
+#endif
+
+// Enable double buffer related code
+#define  HAS_DOUBLE_BUFFER
+
+extern const uint8_t* const MSC_StringDescriptors[MSC_STRING_COUNT];
+extern const tusb_descriptors MSC_descriptors;
+
+
+#endif   // #ifndef __TEENY_USB_INIT_H__
+/////////////////////////////////////////
+//// Device 9
+/////////////////////////////////////////
+#ifndef __TEENY_USB_INIT_H__
+#define __TEENY_USB_INIT_H__
+// forward declare the tusb_descriptors struct
+typedef struct _tusb_descriptors tusb_descriptors;
+
+#define DAPV1_VID                                            0x0d28
+#define DAPV1_PID                                            0x0204
+#define DAPV1_STRING_COUNT                                   (4)
+
+// device.bmAttributes & 0x40   USB_CONFIG_SELF_POWERED
+// device.bmAttributes & 0x20   USB_CONFIG_REMOTE_WAKEUP
+#define DAPV1_DEV_STATUS                                    (0 | 0)
+
+
+// Endpoint usage:
+#define DAPV1_MAX_EP                                         (2)
+#define DAPV1_EP_NUM                                         (DAPV1_MAX_EP + 1)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 FS Core
+///////////////////////////////////////////////
+
+#ifdef DAPV1_BTABLE_ADDRESS
+#undef DAPV1_BTABLE_ADDRESS
+#endif
+#define DAPV1_BTABLE_ADDRESS                                 (0)
+#define DAPV1_EP_BUF_DESC_TABLE_SIZE                         (8)
+// PMA buffer reserved for buffer description table
+#define DAPV1_USB_BUF_START                                  (DAPV1_EP_BUF_DESC_TABLE_SIZE * DAPV1_EP_NUM)
+
+// EndPoints 0 defines
+#define DAPV1_EP0_RX_SIZE                                    (64)
+#define DAPV1_EP0_RX_ADDR                                    (DAPV1_USB_BUF_START + (0))
+#define DAPV1_EP0_TX_SIZE                                    (64)
+#define DAPV1_EP0_TX_ADDR                                    (DAPV1_USB_BUF_START + (64))
+#define DAPV1_EP0_RX_TYPE                                    USB_EP_CONTROL
+#define DAPV1_EP0_TX_TYPE                                    USB_EP_CONTROL
+
+#define DAPV1_EP0_TYPE                                       USB_EP_CONTROL
+#define DAPV1_EP0_TX0_ADDR                                   (DAPV1_USB_BUF_START + (0))
+#define DAPV1_EP0_TX1_ADDR                                   (DAPV1_USB_BUF_START + (64))
+#define DAPV1_EP0_RX0_ADDR                                   (DAPV1_USB_BUF_START + (0))
+#define DAPV1_EP0_RX1_ADDR                                   (DAPV1_USB_BUF_START + (64))
+
+// EndPoints 1 defines
+#define DAPV1_EP1_RX_SIZE                                    (64)
+#define DAPV1_EP1_RX_ADDR                                    (DAPV1_USB_BUF_START + (128))
+#define DAPV1_EP1_TX_SIZE                                    (0)
+#define DAPV1_EP1_TX_ADDR                                    (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP1_RX_TYPE                                    USB_EP_INTERRUPT
+#define DAPV1_EP1_TX_TYPE                                    USB_EP_Invalid
+
+#define DAPV1_EP1_TYPE                                       USB_EP_INTERRUPT
+#define DAPV1_EP1_TX0_ADDR                                   (DAPV1_USB_BUF_START + (128))
+#define DAPV1_EP1_TX1_ADDR                                   (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP1_RX0_ADDR                                   (DAPV1_USB_BUF_START + (128))
+#define DAPV1_EP1_RX1_ADDR                                   (DAPV1_USB_BUF_START + (192))
+
+// EndPoints 2 defines
+#define DAPV1_EP2_RX_SIZE                                    (0)
+#define DAPV1_EP2_RX_ADDR                                    (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP2_TX_SIZE                                    (64)
+#define DAPV1_EP2_TX_ADDR                                    (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP2_RX_TYPE                                    USB_EP_Invalid
+#define DAPV1_EP2_TX_TYPE                                    USB_EP_INTERRUPT
+
+#define DAPV1_EP2_TYPE                                       USB_EP_INTERRUPT
+#define DAPV1_EP2_TX0_ADDR                                   (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP2_TX1_ADDR                                   (DAPV1_USB_BUF_START + (256))
+#define DAPV1_EP2_RX0_ADDR                                   (DAPV1_USB_BUF_START + (192))
+#define DAPV1_EP2_RX1_ADDR                                   (DAPV1_USB_BUF_START + (256))
+
+
+// EndPoint max packed sizes
+extern const uint8_t DAPV1_txEpMaxSize[];
+#define DAPV1_TXEP_MAX_SIZE                                  \
+const uint8_t DAPV1_txEpMaxSize[] = \
+{ DAPV1_EP0_TX_SIZE, 0, DAPV1_EP2_TX_SIZE,  };
+extern const uint8_t DAPV1_rxEpMaxSize[];
+#define DAPV1_RXEP_MAX_SIZE                                  \
+const uint8_t DAPV1_rxEpMaxSize[] = \
+{ DAPV1_EP0_RX_SIZE, DAPV1_EP1_RX_SIZE, 0,  };
+
+// EndPoints init function for USB FS core
+#define DAPV1_TUSB_INIT_EP_FS(dev) \
+  do{\
+    /* Init ep0 */ \
+    INIT_EP_BiDirection(dev, PCD_ENDP0, DAPV1_EP0_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP0, DAPV1_EP0_TX_ADDR);  \
+    SET_RX_ADDR(dev, PCD_ENDP0, DAPV1_EP0_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP0, DAPV1_EP0_RX_SIZE);  \
+    /* Init ep1 */ \
+    INIT_EP_RxOnly(dev, PCD_ENDP1, DAPV1_EP1_TYPE);  \
+    SET_RX_ADDR(dev, PCD_ENDP1, DAPV1_EP1_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP1, DAPV1_EP1_RX_SIZE);  \
+    /* Init ep2 */ \
+    INIT_EP_TxOnly(dev, PCD_ENDP2, DAPV1_EP2_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP2, DAPV1_EP2_TX_ADDR);  \
+}while(0)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG Core
+///////////////////////////////////////////////
+#define DAPV1_OTG_MAX_OUT_SIZE                               (64)
+#define DAPV1_OTG_CONTROL_EP_NUM                             (1)
+#define DAPV1_OTG_OUT_EP_NUM                                 (1)
+// RX FIFO size / 4 > (CONTROL_EP_NUM * 5 + 8) +  (MAX_OUT_SIZE / 4 + 1) + (OUT_EP_NUM*2) + 1 = 33
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG FS Core
+///////////////////////////////////////////////
+#define DAPV1_OTG_RX_FIFO_SIZE_FS                            (256)
+#define DAPV1_OTG_RX_FIFO_ADDR_FS                            (0)
+// Sum of IN ep max packet size is 128
+// Remain Fifo size is 1024 in bytes, Rx Used 256 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define DAPV1_EP0_TX_FIFO_ADDR_FS                            (256)
+#define DAPV1_EP0_TX_FIFO_SIZE_FS                            (DAPV1_EP0_TX_SIZE * 7)
+#define DAPV1_EP2_TX_FIFO_ADDR_FS                            (704)
+#define DAPV1_EP2_TX_FIFO_SIZE_FS                            (DAPV1_EP2_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_FS)
+#define DAPV1_TUSB_INIT_EP_OTG_FS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_FS) { \
+      SET_RX_FIFO(dev, DAPV1_OTG_RX_FIFO_ADDR_FS, DAPV1_OTG_RX_FIFO_SIZE_FS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, DAPV1_EP0_TX_TYPE, DAPV1_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, DAPV1_EP0_TX_FIFO_ADDR_FS, DAPV1_EP0_TX_FIFO_SIZE_FS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, DAPV1_EP0_RX_TYPE, DAPV1_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Rx(dev, PCD_ENDP1, DAPV1_EP1_RX_TYPE, DAPV1_EP1_RX_SIZE); \
+      /* Init Ep2  */\
+      INIT_EP_Tx(dev, PCD_ENDP2, DAPV1_EP2_TX_TYPE, DAPV1_EP2_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP2, DAPV1_EP2_TX_FIFO_ADDR_FS, DAPV1_EP2_TX_FIFO_SIZE_FS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_FS)
+#define DAPV1_TUSB_INIT_EP_OTG_FS(dev) 
+    
+#endif  // #if defined(USB_OTG_FS)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG HS Core
+///////////////////////////////////////////////
+#define DAPV1_OTG_RX_FIFO_SIZE_HS                            (512)
+#define DAPV1_OTG_RX_FIFO_ADDR_HS                            (0)
+// Sum of IN ep max packet size is 128
+// Remain Fifo size is 3584 in bytes, Rx Used 512 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define DAPV1_EP0_TX_FIFO_ADDR_HS                            (512)
+#define DAPV1_EP0_TX_FIFO_SIZE_HS                            (DAPV1_EP0_TX_SIZE * 7)
+#define DAPV1_EP2_TX_FIFO_ADDR_HS                            (960)
+#define DAPV1_EP2_TX_FIFO_SIZE_HS                            (DAPV1_EP2_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_HS)
+#define DAPV1_TUSB_INIT_EP_OTG_HS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_HS) { \
+      SET_RX_FIFO(dev, DAPV1_OTG_RX_FIFO_ADDR_HS, DAPV1_OTG_RX_FIFO_SIZE_HS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, DAPV1_EP0_TX_TYPE, DAPV1_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, DAPV1_EP0_TX_FIFO_ADDR_HS, DAPV1_EP0_TX_FIFO_SIZE_HS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, DAPV1_EP0_RX_TYPE, DAPV1_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Rx(dev, PCD_ENDP1, DAPV1_EP1_RX_TYPE, DAPV1_EP1_RX_SIZE); \
+      /* Init Ep2  */\
+      INIT_EP_Tx(dev, PCD_ENDP2, DAPV1_EP2_TX_TYPE, DAPV1_EP2_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP2, DAPV1_EP2_TX_FIFO_ADDR_HS, DAPV1_EP2_TX_FIFO_SIZE_HS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_HS)
+#define DAPV1_TUSB_INIT_EP_OTG_HS(dev) 
+    
+#endif  // #if defined(USB_OTG_HS)
+#define DAPV1_TUSB_INIT_EP_OTG(dev) \
+  do{\
+    DAPV1_TUSB_INIT_EP_OTG_FS(dev); \
+    DAPV1_TUSB_INIT_EP_OTG_HS(dev); \
+  }while(0)
+
+
+#if defined(USB)
+#define DAPV1_TUSB_INIT_EP(dev) DAPV1_TUSB_INIT_EP_FS(dev)
+
+// Teeny USB device init function for FS core
+#define DAPV1_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = DAPV1_DEV_STATUS;         \
+    dev->rx_max_size = DAPV1_rxEpMaxSize;         \
+    dev->tx_max_size = DAPV1_txEpMaxSize;         \
+    dev->descriptors = &DAPV1_descriptors;         \
+  }while(0)
+
+#endif
+
+#if defined(USB_OTG_FS) || defined(USB_OTG_HS)
+#define DAPV1_TUSB_INIT_EP(dev) DAPV1_TUSB_INIT_EP_OTG(dev)
+
+// Teeny USB device init function for OTG core
+#define DAPV1_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = DAPV1_DEV_STATUS;         \
+    dev->descriptors = &DAPV1_descriptors;         \
+  }while(0)
+
+#endif
+
+#define DAPV1_TUSB_INIT(dev) \
+  do{\
+    DAPV1_TUSB_INIT_EP(dev);   \
+    DAPV1_TUSB_INIT_DEVICE(dev);   \
+  }while(0)
+
+// Get End Point count
+#ifndef  EP_NUM
+#define  EP_NUM 1
+#endif
+#if DAPV1_EP_NUM > EP_NUM
+#undef   EP_NUM
+#define  EP_NUM  DAPV1_EP_NUM
+#endif
+
+extern const uint8_t* const DAPV1_StringDescriptors[DAPV1_STRING_COUNT];
+extern const tusb_descriptors DAPV1_descriptors;
+
+#define DAPV1_REPORT_DESCRIPTOR_SIZE_IF0  (33)
+extern const uint8_t DAPV1_ReportDescriptor_if0[DAPV1_REPORT_DESCRIPTOR_SIZE_IF0];
+
+
+#endif   // #ifndef __TEENY_USB_INIT_H__
+/////////////////////////////////////////
+//// Device 10
+/////////////////////////////////////////
+#ifndef __TEENY_USB_INIT_H__
+#define __TEENY_USB_INIT_H__
+// forward declare the tusb_descriptors struct
+typedef struct _tusb_descriptors tusb_descriptors;
+
+#define DAPV2_VID                                            0x0d28
+#define DAPV2_PID                                            0x0204
+#define DAPV2_STRING_COUNT                                   (5)
+
+// device.bmAttributes & 0x40   USB_CONFIG_SELF_POWERED
+// device.bmAttributes & 0x20   USB_CONFIG_REMOTE_WAKEUP
+#define DAPV2_DEV_STATUS                                    (0 | 0)
+
+
+// Endpoint usage:
+#define DAPV2_MAX_EP                                         (2)
+#define DAPV2_EP_NUM                                         (DAPV2_MAX_EP + 1)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 FS Core
+///////////////////////////////////////////////
+
+#ifdef DAPV2_BTABLE_ADDRESS
+#undef DAPV2_BTABLE_ADDRESS
+#endif
+#define DAPV2_BTABLE_ADDRESS                                 (0)
+#define DAPV2_EP_BUF_DESC_TABLE_SIZE                         (8)
+// PMA buffer reserved for buffer description table
+#define DAPV2_USB_BUF_START                                  (DAPV2_EP_BUF_DESC_TABLE_SIZE * DAPV2_EP_NUM)
+
+// EndPoints 0 defines
+#define DAPV2_EP0_RX_SIZE                                    (64)
+#define DAPV2_EP0_RX_ADDR                                    (DAPV2_USB_BUF_START + (0))
+#define DAPV2_EP0_TX_SIZE                                    (64)
+#define DAPV2_EP0_TX_ADDR                                    (DAPV2_USB_BUF_START + (64))
+#define DAPV2_EP0_RX_TYPE                                    USB_EP_CONTROL
+#define DAPV2_EP0_TX_TYPE                                    USB_EP_CONTROL
+
+#define DAPV2_EP0_TYPE                                       USB_EP_CONTROL
+#define DAPV2_EP0_TX0_ADDR                                   (DAPV2_USB_BUF_START + (0))
+#define DAPV2_EP0_TX1_ADDR                                   (DAPV2_USB_BUF_START + (64))
+#define DAPV2_EP0_RX0_ADDR                                   (DAPV2_USB_BUF_START + (0))
+#define DAPV2_EP0_RX1_ADDR                                   (DAPV2_USB_BUF_START + (64))
+
+// EndPoints 1 defines
+#define DAPV2_EP1_RX_SIZE                                    (512)
+#define DAPV2_EP1_RX_ADDR                                    (DAPV2_USB_BUF_START + (128))
+#define DAPV2_EP1_TX_SIZE                                    (0)
+#define DAPV2_EP1_TX_ADDR                                    (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP1_RX_TYPE                                    USB_EP_BULK
+#define DAPV2_EP1_TX_TYPE                                    USB_EP_Invalid
+
+#define DAPV2_EP1_TYPE                                       USB_EP_BULK
+#define DAPV2_EP1_TX0_ADDR                                   (DAPV2_USB_BUF_START + (128))
+#define DAPV2_EP1_TX1_ADDR                                   (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP1_RX0_ADDR                                   (DAPV2_USB_BUF_START + (128))
+#define DAPV2_EP1_RX1_ADDR                                   (DAPV2_USB_BUF_START + (640))
+
+// EndPoints 2 defines
+#define DAPV2_EP2_RX_SIZE                                    (0)
+#define DAPV2_EP2_RX_ADDR                                    (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP2_TX_SIZE                                    (512)
+#define DAPV2_EP2_TX_ADDR                                    (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP2_RX_TYPE                                    USB_EP_Invalid
+#define DAPV2_EP2_TX_TYPE                                    USB_EP_BULK
+
+#define DAPV2_EP2_TYPE                                       USB_EP_BULK
+#define DAPV2_EP2_TX0_ADDR                                   (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP2_TX1_ADDR                                   (DAPV2_USB_BUF_START + (1152))
+#define DAPV2_EP2_RX0_ADDR                                   (DAPV2_USB_BUF_START + (640))
+#define DAPV2_EP2_RX1_ADDR                                   (DAPV2_USB_BUF_START + (1152))
+
+
+// EndPoint max packed sizes
+extern const uint8_t DAPV2_txEpMaxSize[];
+#define DAPV2_TXEP_MAX_SIZE                                  \
+const uint8_t DAPV2_txEpMaxSize[] = \
+{ DAPV2_EP0_TX_SIZE, 0, DAPV2_EP2_TX_SIZE,  };
+extern const uint8_t DAPV2_rxEpMaxSize[];
+#define DAPV2_RXEP_MAX_SIZE                                  \
+const uint8_t DAPV2_rxEpMaxSize[] = \
+{ DAPV2_EP0_RX_SIZE, DAPV2_EP1_RX_SIZE, 0,  };
+
+// EndPoints init function for USB FS core
+#define DAPV2_TUSB_INIT_EP_FS(dev) \
+  do{\
+    /* Init ep0 */ \
+    INIT_EP_BiDirection(dev, PCD_ENDP0, DAPV2_EP0_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP0, DAPV2_EP0_TX_ADDR);  \
+    SET_RX_ADDR(dev, PCD_ENDP0, DAPV2_EP0_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP0, DAPV2_EP0_RX_SIZE);  \
+    /* Init ep1 */ \
+    INIT_EP_RxOnly(dev, PCD_ENDP1, DAPV2_EP1_TYPE);  \
+    SET_RX_ADDR(dev, PCD_ENDP1, DAPV2_EP1_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP1, DAPV2_EP1_RX_SIZE);  \
+    /* Init ep2 */ \
+    INIT_EP_TxOnly(dev, PCD_ENDP2, DAPV2_EP2_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP2, DAPV2_EP2_TX_ADDR);  \
+}while(0)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG Core
+///////////////////////////////////////////////
+#define DAPV2_OTG_MAX_OUT_SIZE                               (512)
+#define DAPV2_OTG_CONTROL_EP_NUM                             (1)
+#define DAPV2_OTG_OUT_EP_NUM                                 (1)
+// RX FIFO size / 4 > (CONTROL_EP_NUM * 5 + 8) +  (MAX_OUT_SIZE / 4 + 1) + (OUT_EP_NUM*2) + 1 = 145
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG FS Core
+///////////////////////////////////////////////
+#define DAPV2_OTG_RX_FIFO_SIZE_FS                            (580)
+#define DAPV2_OTG_RX_FIFO_ADDR_FS                            (0)
+// Sum of IN ep max packet size is 576
+// Remain Fifo size is 700 in bytes, Rx Used 580 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define DAPV2_EP0_TX_FIFO_ADDR_FS                            (580)
+#define DAPV2_EP0_TX_FIFO_SIZE_FS                            (DAPV2_EP0_TX_SIZE * 1)
+#define DAPV2_EP2_TX_FIFO_ADDR_FS                            (644)
+#define DAPV2_EP2_TX_FIFO_SIZE_FS                            (DAPV2_EP2_TX_SIZE * 1)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_FS)
+#define DAPV2_TUSB_INIT_EP_OTG_FS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_FS) { \
+      SET_RX_FIFO(dev, DAPV2_OTG_RX_FIFO_ADDR_FS, DAPV2_OTG_RX_FIFO_SIZE_FS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, DAPV2_EP0_TX_TYPE, DAPV2_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, DAPV2_EP0_TX_FIFO_ADDR_FS, DAPV2_EP0_TX_FIFO_SIZE_FS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, DAPV2_EP0_RX_TYPE, DAPV2_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Rx(dev, PCD_ENDP1, DAPV2_EP1_RX_TYPE, DAPV2_EP1_RX_SIZE); \
+      /* Init Ep2  */\
+      INIT_EP_Tx(dev, PCD_ENDP2, DAPV2_EP2_TX_TYPE, DAPV2_EP2_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP2, DAPV2_EP2_TX_FIFO_ADDR_FS, DAPV2_EP2_TX_FIFO_SIZE_FS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_FS)
+#define DAPV2_TUSB_INIT_EP_OTG_FS(dev) 
+    
+#endif  // #if defined(USB_OTG_FS)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG HS Core
+///////////////////////////////////////////////
+#define DAPV2_OTG_RX_FIFO_SIZE_HS                            (580)
+#define DAPV2_OTG_RX_FIFO_ADDR_HS                            (0)
+// Sum of IN ep max packet size is 576
+// Remain Fifo size is 3516 in bytes, Rx Used 580 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define DAPV2_EP0_TX_FIFO_ADDR_HS                            (580)
+#define DAPV2_EP0_TX_FIFO_SIZE_HS                            (DAPV2_EP0_TX_SIZE * 6)
+#define DAPV2_EP2_TX_FIFO_ADDR_HS                            (964)
+#define DAPV2_EP2_TX_FIFO_SIZE_HS                            (DAPV2_EP2_TX_SIZE * 6)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_HS)
+#define DAPV2_TUSB_INIT_EP_OTG_HS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_HS) { \
+      SET_RX_FIFO(dev, DAPV2_OTG_RX_FIFO_ADDR_HS, DAPV2_OTG_RX_FIFO_SIZE_HS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, DAPV2_EP0_TX_TYPE, DAPV2_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, DAPV2_EP0_TX_FIFO_ADDR_HS, DAPV2_EP0_TX_FIFO_SIZE_HS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, DAPV2_EP0_RX_TYPE, DAPV2_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Rx(dev, PCD_ENDP1, DAPV2_EP1_RX_TYPE, DAPV2_EP1_RX_SIZE); \
+      /* Init Ep2  */\
+      INIT_EP_Tx(dev, PCD_ENDP2, DAPV2_EP2_TX_TYPE, DAPV2_EP2_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP2, DAPV2_EP2_TX_FIFO_ADDR_HS, DAPV2_EP2_TX_FIFO_SIZE_HS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_HS)
+#define DAPV2_TUSB_INIT_EP_OTG_HS(dev) 
+    
+#endif  // #if defined(USB_OTG_HS)
+#define DAPV2_TUSB_INIT_EP_OTG(dev) \
+  do{\
+    DAPV2_TUSB_INIT_EP_OTG_FS(dev); \
+    DAPV2_TUSB_INIT_EP_OTG_HS(dev); \
+  }while(0)
+
+
+#if defined(USB)
+#define DAPV2_TUSB_INIT_EP(dev) DAPV2_TUSB_INIT_EP_FS(dev)
+
+// Teeny USB device init function for FS core
+#define DAPV2_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = DAPV2_DEV_STATUS;         \
+    dev->rx_max_size = DAPV2_rxEpMaxSize;         \
+    dev->tx_max_size = DAPV2_txEpMaxSize;         \
+    dev->descriptors = &DAPV2_descriptors;         \
+  }while(0)
+
+#endif
+
+#if defined(USB_OTG_FS) || defined(USB_OTG_HS)
+#define DAPV2_TUSB_INIT_EP(dev) DAPV2_TUSB_INIT_EP_OTG(dev)
+
+// Teeny USB device init function for OTG core
+#define DAPV2_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = DAPV2_DEV_STATUS;         \
+    dev->descriptors = &DAPV2_descriptors;         \
+  }while(0)
+
+#endif
+
+#define DAPV2_TUSB_INIT(dev) \
+  do{\
+    DAPV2_TUSB_INIT_EP(dev);   \
+    DAPV2_TUSB_INIT_DEVICE(dev);   \
+  }while(0)
+
+// Get End Point count
+#ifndef  EP_NUM
+#define  EP_NUM 1
+#endif
+#if DAPV2_EP_NUM > EP_NUM
+#undef   EP_NUM
+#define  EP_NUM  DAPV2_EP_NUM
+#endif
+
+extern const uint8_t* const DAPV2_StringDescriptors[DAPV2_STRING_COUNT];
+extern const tusb_descriptors DAPV2_descriptors;
+
+// Enable WCID related code
+#define  HAS_WCID
+
+#ifndef WCID_VENDOR_CODE
+#define  WCID_VENDOR_CODE       0x17
+extern const uint8_t WCID_StringDescriptor_MSOS[];
+#endif
 
 
 #endif   // #ifndef __TEENY_USB_INIT_H__

@@ -15,5 +15,8 @@ return {
     require("hid_user_desc"),
     require("hid_kb_desc"),
     require("hid_mouse_desc"),
+    require("msc_desc"),
+    require("daplinkv1_desc"),
+    require("daplinkv2_desc"),
 }
 
