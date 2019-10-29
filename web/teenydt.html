@@ -123,6 +123,8 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
     <option value="hid_user">HID User</option>
     <option value="hid_kb">HID Keyboard</option>
     <option value="hid_mouse">HID Mouse</option>
+    <option value="multi_config">Multi Config</option>
+    <option value="simplest">Simplest</option>
 </select>
 <p>
 
@@ -574,6 +576,71 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
             extDesc = HID_BootMouse(), -- same as report = xxx
             EndPoint(IN(1),  Interrupt, 8),
             EndPoint(OUT(1), Interrupt, 8),
+       }
+   }
+}</div>
+
+<div style="display: none;" id="multi_config" >-- TeenyUSB not support multiple config
+return Device {
+    strManufacturer = "TeenyDT",
+    strProduct = "TeenyDT Multi Config DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "MULCFG",
+    Config {
+        USB_HID{
+            ReadEp = EndPoint(IN(2),  Interrupt, 16),
+            WriteEp = EndPoint(OUT(2), Interrupt, 16),
+            report = HID_InOut(16),
+        },
+        CDC_ACM{
+            EndPoint(IN(8),  Interrupt, 16),
+            EndPoint(IN(1), BulkDouble, 32),
+            EndPoint(OUT(1),  BulkDouble, 32),
+        },
+        Interface{
+            WCID=WinUSB,
+            strInterface = "TeenyUSB WinUSB",
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(3),  BulkDouble, 32),
+            EndPoint(OUT(3), BulkDouble, 32),
+        },
+        Interface{
+            bInterfaceClass = 0x08,        -- MSC
+            bInterfaceSubClass = 0x06,     -- SCSI
+            bInterfaceProtocol = 0x50,     -- BOT
+            EndPoint(IN(4),  BulkDouble, 64),
+            EndPoint(OUT(4), BulkDouble, 64),
+        },
+   },
+   Config {
+        Interface{
+            WCID=WinUSB,
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(1),  BulkDouble, 32),
+            EndPoint(OUT(1), BulkDouble, 32),
+        },
+        Interface{
+            bInterfaceClass = 0x08,        -- MSC
+            bInterfaceSubClass = 0x06,     -- SCSI
+            bInterfaceProtocol = 0x50,     -- BOT
+            EndPoint(IN(2),  BulkDouble, 64),
+            EndPoint(OUT(2), BulkDouble, 64),
+        },
+        USB_HID{
+            ReadEp = EndPoint(IN(3),  Interrupt, 16),
+            WriteEp = EndPoint(OUT(3), Interrupt, 16),
+            report = HID_InOut(16),
+        },
+   },
+}</div>
+
+<div style="display: none;" id="simplest" >-- A device only use control EP0 
+-- All attrubtes are set to default value
+return Device {
+    Config {
+       Interface{
        }
    }
 }</div>
