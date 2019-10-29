@@ -257,11 +257,14 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         document.getElementById("MaxMem").value = r[1];
     }
     
+    var lastAction = null;
+    
     function toTeenyC(){
         document.getElementById("fileName").value = "teeny_usb_desc.c";
         clearLog();
         cEditor.setValue( fengari.load('return gen_tc([==[' + luaEditor.getValue() + ']==])' )()  );
         cEditor.clearSelection();
+        lastAction = toTeenyC;
     }
     function toTeenyH(){
         document.getElementById("fileName").value = "teeny_usb_init.h";
@@ -269,12 +272,14 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         clearLog();
         cEditor.setValue( fengari.load('return gen_th([==[' + luaEditor.getValue() + ']==]'+param+')' )()  );
         cEditor.clearSelection();
+        lastAction = toTeenyH;
     }
     function toOpenCM3C(){
         document.getElementById("fileName").value = "opencm3_usb_init.c";
         clearLog();
         cEditor.setValue( fengari.load('return gen_oc([==[' + luaEditor.getValue() + ']==])' )()  );
         cEditor.clearSelection();
+        lastAction = toOpenCM3C;
     }
     function toOpenCM3H(){
         document.getElementById("fileName").value = "opencm3_usb_init.h";
@@ -282,6 +287,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         clearLog();
         cEditor.setValue( fengari.load('return gen_oh([==[' + luaEditor.getValue() + ']==]'+param+')' )()  );
         cEditor.clearSelection();
+        lastAction = toOpenCM3H;
     }
     
     var saveData = (function () {
@@ -314,6 +320,9 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         var e = document.getElementById(t);
         luaEditor.setValue( e.innerHTML );
         luaEditor.clearSelection();
+        if(lastAction){
+            lastAction();
+        }
     }
     
     
