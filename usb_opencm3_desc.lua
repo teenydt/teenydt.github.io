@@ -456,8 +456,8 @@ extern const uint8_t WCID_StringDescriptor_MSOS[];
 
 
     return genCode({EXTDEF = filter(dev, extDefine) },[[
-#ifndef __OPENCM3_USB_INIT_H__
-#define __OPENCM3_USB_INIT_H__
+#ifndef __$(PREFIX)OPENCM3_USB_INIT_H__
+#define __$(PREFIX)OPENCM3_USB_INIT_H__
 
 #include <libopencm3/usb/usbd.h>
 
@@ -478,6 +478,6 @@ usbd_device *$(PREFIX)usb_init(
 
 // Extra define
 $(EXTDEF)
-#endif
+#endif  // #ifndef __$(PREFIX)OPENCM3_USB_INIT_H__
 ]])
 end
