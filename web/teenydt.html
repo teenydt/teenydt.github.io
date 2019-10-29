@@ -19,7 +19,9 @@
 <body>
 <h1> Teeny DT Online </h1>
 
-<p> A lua based USB descriptor generate tool. Source code on <a href="https://github.com/xtoolbox/teenydt">GitHub</a> </p>
+<p> A lua based USB descriptor generate tool, source code on <a href="https://github.com/xtoolbox/teenydt">GitHub</a>.
+How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/master/demo/composite">Demo for TeenyUSB</a>, 
+<a href="https://github.com/xtoolbox/TeenyDT/tree/master/demo/opencm3">Demo for libOpenCM3</a>.</p>
 
 <table border="0">
 <tr>
@@ -55,21 +57,22 @@
                 <option value="[9,1280]">STM32H7xx_OTG_FS</option>
                 <option value="[9,4096]">STM32H7xx_OTG_HS</option>
         </select>
-        Max Ep:<input type="text" id="MaxEp" value="7" style="width:20px;" />
-        Max Mem:<input type="text" id="MaxMem" value="1024" style="width:60px;"/>
+        MaxEp:<input type="text" id="MaxEp" value="7" style="width:20px;" />
+        MaxMem:<input type="text" id="MaxMem" value="1024" style="width:40px;"/>
+        <button id="downloadDesc" onClick="downloadDesc();">Download Desc</button>
     </td>
     <td>
 
     </td>
     <td>
         File name:<input type="text" id="fileName" value=""  readonly/>
+        <button id="downloadCode" onClick="downloadCode();">Download Code</button>
     </td>
 </tr>
 
 <tr>
 <td>
-<div id="luaDesc">
-return Device {
+<div id="luaDesc">return Device {
     strManufacturer = "TeenyUSB",
     strProduct = "TeenyUSB Composite DEMO",
     strSerial = "TUSB123456",
@@ -108,7 +111,23 @@ return Device {
 </td>
 
 <td>
+<p>Example Desc</p>
 <p>
+</p>
+<select id="exampleDesc" onchange="changeDesc();">
+    <option selected="selected" value="composite">Composite</option>
+    <option value="cdc_acm">CDC ACM</option>
+    <option value="cdc_acm5">CDC ACMx5</option>
+    <option value="winusb">WinUSB</option>
+    <option value="winusb20">WinUSB2.0</option>
+    <option value="hid_user">HID User</option>
+    <option value="hid_kb">HID Keyboard</option>
+    <option value="hid_mouse">HID Mouse</option>
+</select>
+<p>
+
+<br><br><br><br>
+
 <button id="idTeenyC" onClick="toTeenyC();">TeenyUSB C</button>
 </p>
 
@@ -123,17 +142,18 @@ return Device {
 <button id="idOpenCM3H" onClick="toOpenCM3H();">OpenCM3 H</button>
 </p>
 
-<p>Code Style<p/>
+<p>Color Style<p/>
 
 <p>
 <select id="theme" onchange="changeTheme();"><optgroup label="Bright"><option value="ace/theme/chrome">Chrome</option><option value="ace/theme/clouds">Clouds</option><option value="ace/theme/crimson_editor">Crimson Editor</option><option value="ace/theme/dawn">Dawn</option><option value="ace/theme/dreamweaver">Dreamweaver</option><option value="ace/theme/eclipse">Eclipse</option><option value="ace/theme/github">GitHub</option><option value="ace/theme/iplastic">IPlastic</option><option value="ace/theme/solarized_light">Solarized Light</option><option value="ace/theme/textmate">TextMate</option><option value="ace/theme/tomorrow">Tomorrow</option><option value="ace/theme/xcode">XCode</option><option value="ace/theme/kuroir">Kuroir</option><option value="ace/theme/katzenmilch">KatzenMilch</option><option value="ace/theme/sqlserver">SQL Server</option></optgroup><optgroup label="Dark"><option value="ace/theme/ambiance">Ambiance</option><option value="ace/theme/chaos">Chaos</option><option value="ace/theme/clouds_midnight">Clouds Midnight</option><option value="ace/theme/dracula">Dracula</option><option value="ace/theme/cobalt">Cobalt</option><option value="ace/theme/gruvbox">Gruvbox</option><option value="ace/theme/gob">Green on Black</option><option value="ace/theme/idle_fingers">idle Fingers</option><option value="ace/theme/kr_theme">krTheme</option><option value="ace/theme/merbivore">Merbivore</option><option value="ace/theme/merbivore_soft">Merbivore Soft</option><option value="ace/theme/mono_industrial">Mono Industrial</option><option value="ace/theme/monokai">Monokai</option><option value="ace/theme/pastel_on_dark">Pastel on dark</option><option value="ace/theme/solarized_dark">Solarized Dark</option><option value="ace/theme/terminal">Terminal</option><option value="ace/theme/tomorrow_night">Tomorrow Night</option><option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option><option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option><option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option><option value="ace/theme/twilight">Twilight</option><option value="ace/theme/vibrant_ink">Vibrant Ink</option></optgroup></select>
 </p>
 
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
 </td>
 
 <td>
-<div id="result">
-</div>
+<div id="result"></div>
 </td>
 
 </tr>
@@ -153,25 +173,29 @@ return Device {
 
     require("usb_teeny_desc")
     require("usb_opencm3_desc")
-    
+    local fileHeader = [[
+/////////////////////////////////////////////////////////////
+//// Auto generate by TeenyDT, http://dt.tusb.org
+/////////////////////////////////////////////////////////////
+]]
     function gen_tc(src)
         local desc = load(src)()
-        return Generate_TeenyUSB_desc(desc)
+        return fileHeader .. Generate_TeenyUSB_desc(desc)
     end
     
     function gen_th(src, maxep, maxmem)
         local desc = load(src)()
-        return Generate_TeenyUSB_header(desc, maxep or 9, maxmem or 4096)
+        return fileHeader .. Generate_TeenyUSB_header(desc, maxep or 9, maxmem or 4096)
     end
     
     function gen_oc(src)
         local desc = load(src)()
-        return Generate_LibOpenCM3_desc(desc)
+        return fileHeader .. Generate_LibOpenCM3_desc(desc)
     end
     
     function gen_oh(src, maxep, maxmem)
         local desc = load(src)()
-        return Generate_LibOpenCM3_header(desc, maxep or 9, maxmem or 4096)
+        return fileHeader .. Generate_LibOpenCM3_header(desc, maxep or 9, maxmem or 4096)
     end
     
     
@@ -250,6 +274,309 @@ return Device {
         cEditor.setValue( fengari.load('return gen_oh([[' + luaEditor.getValue() + ']]'+param+')' )()  );
     }
     
+    var saveData = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([data], {type: "text/plain"});
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    function downloadDesc(){
+        var t = document.getElementById("exampleDesc").value;
+        saveData(luaEditor.getValue(), t+"_desc.lua");
+    }
+    function downloadCode(){
+        var fn = document.getElementById("fileName").value
+        if(fn != ""){
+            saveData(cEditor.getValue(), fn);
+        }
+    }
+    
+    function changeDesc(){
+        var t = document.getElementById("exampleDesc").value;
+        var e = document.getElementById(t)
+        luaEditor.setValue( e.innerHTML )
+    }
+    
+    changeDesc()
+    
 </script>
+
+<div style="display: none;" id="composite" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB Composite DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "COMP",
+    Config {
+        USB_HID{
+            ReadEp = EndPoint(IN(2),  Interrupt, 16),
+            WriteEp = EndPoint(OUT(2), Interrupt, 16),
+            report = HID_InOut(16),
+        },
+        CDC_ACM{
+            EndPoint(IN(8),  Interrupt, 16),
+            EndPoint(IN(1), BulkDouble, 32),
+            EndPoint(OUT(1),  BulkDouble, 32),
+        },
+        Interface{
+            WCID=WinUSB,
+            strInterface = "TeenyUSB WinUSB",
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(3),  BulkDouble, 32),
+            EndPoint(OUT(3), BulkDouble, 32),
+        },
+        Interface{
+            bInterfaceClass = 0x08,        -- MSC
+            bInterfaceSubClass = 0x06,     -- SCSI
+            bInterfaceProtocol = 0x50,     -- BOT
+            EndPoint(IN(4),  BulkDouble, 64),
+            EndPoint(OUT(4), BulkDouble, 64),
+        },
+   }
+}</div>
+
+
+
+<div style="display: none;" id="cdc_acm5" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB CDC5 DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "CDC_ACM5",
+    Config {
+        CDC_ACM{
+            EndPoint(IN(8),  Interrupt, 16),
+            EndPoint(IN(1), BulkDouble, 32),
+            EndPoint(OUT(1),  BulkDouble, 32),
+        },
+        CDC_ACM{
+            EndPoint(IN(9),  Interrupt, 16),
+            EndPoint(IN(2), BulkDouble, 32),
+            EndPoint(OUT(2),  BulkDouble, 32),
+        },
+        CDC_ACM{
+            EndPoint(IN(10),  Interrupt, 16),
+            EndPoint(IN(3), BulkDouble, 32),
+            EndPoint(OUT(3),  BulkDouble, 32),
+        },
+        CDC_ACM{
+            EndPoint(IN(11),  Interrupt, 16),
+            EndPoint(IN(4), BulkDouble, 32),
+            EndPoint(OUT(4),  BulkDouble, 32),
+        },
+        CDC_ACM{
+            EndPoint(IN(12),  Interrupt, 16),
+            EndPoint(IN(5), BulkDouble, 32),
+            EndPoint(OUT(5),  BulkDouble, 32),
+        },
+   }
+}</div>
+
+<div style="display: none;" id="cdc_acm" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB CDC DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "CDC_ACM",
+    Config {
+        -- here expand the CDC_ACM to a IAD with 2 interfaces
+        IAD{
+            Interface{
+                bInterfaceClass = 2,
+                bInterfaceSubClass = 2,
+                bInterfaceProtocol = 1,
+                Function{   bDescriptorSubtype = 0,
+                    name = "cdc acm header descriptor",
+                    varData = {
+                        {bcdCDC = 0x110},
+                    }
+                },
+                Function{   bDescriptorSubtype = 1,
+                    name = "cdc acm call management descriptor",
+                    varData = {
+                        {bmCapabilities = 0x00},
+                        {bDataInterface = 0x01},
+                    }
+                },
+                Function{   bDescriptorSubtype = 2,
+                    name = "cdc acm descriptor",
+                    varData = {
+                        {bmCapabilities = 0x02},
+                    }
+                },
+                Function{   bDescriptorSubtype = 6,
+                    name = "cdc acm union descriptor",
+                    varData = {
+                        {bMasterInterface = 0x00},
+                        {bSlaveInterface0 = 0x01},
+                    }
+                },
+                EndPoint(IN(8),  Interrupt, 16),
+            },
+            Interface{
+                bInterfaceClass = 0x0a,
+                bInterfaceSubClass = 0,
+                bInterfaceProtocol = 0,
+                -- EndPoint(IN(1), BulkDouble, 32),
+                EndPoint{ -- expand the ep attributes
+                    bEndpointAddress = 0x81, -- same as IN(1)
+                    bmAttributes = BulkDouble,
+                    wMaxPacketSize = 32,
+                    bInterval = 1
+                },
+                EndPoint(OUT(1),  BulkDouble, 32),
+            },
+        }
+   }
+}</div>
+
+<div style="display: none;" id="winusb" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB WinUSB DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "WINUSB",
+    Config {
+        Interface{
+            WCID=WinUSB,
+            strInterface = "TeenyUSB WinUSB 0",
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(1),  BulkDouble, 32),
+            EndPoint(OUT(1), BulkDouble, 32),
+        },
+        Interface{
+            -- another way to set the WinUSB interface GUID
+            extDesc = WinUSB("{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}"),
+            strInterface = "TeenyUSB WinUSB 1",
+            EndPoint(IN(2),  BulkDouble, 32),
+            EndPoint(OUT(2), BulkDouble, 32),
+        },
+        Interface{
+            extDesc = WinUSB("{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}"),
+            strInterface = "TeenyUSB WinUSB 1",
+            EndPoint(IN(3),  BulkDouble, 32),
+            EndPoint(OUT(3), BulkDouble, 32),
+        },
+   }
+}</div>
+
+<div style="display: none;" id="winusb20" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB WinUSB DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    bcdUSB = 0x210, -- Set to 0x210 to use the MS2.0 WCID
+    prefix = "WINUSB20",
+    Config {
+        Interface{
+            WCID=WinUSB,
+            strInterface = "TeenyUSB WinUSB 0",
+            GUID="{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}",
+            EndPoint(IN(1),  BulkDouble, 32),
+            EndPoint(OUT(1), BulkDouble, 32),
+        },
+        Interface{
+            -- another way to set the WinUSB interface GUID
+            extDesc = WinUSB("{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}"),
+            strInterface = "TeenyUSB WinUSB 1",
+            EndPoint(IN(2),  BulkDouble, 32),
+            EndPoint(OUT(2), BulkDouble, 32),
+        },
+        Interface{
+            extDesc = WinUSB("{1D4B2365-4749-48EA-B38A-7C6FDDDD7E26}"),
+            strInterface = "TeenyUSB WinUSB 1",
+            EndPoint(IN(3),  BulkDouble, 32),
+            EndPoint(OUT(3), BulkDouble, 32),
+        },
+   }
+}</div>
+
+<div style="display: none;" id="hid_user" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB User HID DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    bcdUSB = 0x210, -- Set to 0x210 to use the MS2.0 WCID
+    prefix = "USER_HID",
+    Config {
+        -- Expand the USB_HID descriptor
+        Interface{
+            bInterfaceClass = 3,
+            bInterfaceSubClass = 0, -- 1 boot, 0 no boot
+            bInterfaceProtocol = 0, -- 0 none, 1 keyboard , 2 mouse
+            HIDDescriptor{
+                -- same as HID_InOut(64)
+                HID_BuildReport([[
+        -- report descriptor for general input/output
+        0x06, 0x00, 0xFF,  -- Usage Page (Vendor Defined 0xFF00)
+        0x09, 0x01,        -- Usage (0x01)
+        0xA1, 0x01,        -- Collection (Application)
+        0x09, 0x02,        --   Usage (0x02)
+        0x15, 0x00,        --   Logical Minimum (0)
+        0x25, 0xFF,        --   Logical Maximum (255)
+        0x75, 0x08,        --   Report Size (8)
+        0x95, 0x40,        --   Report Count (64)
+        0x81, 0x02,        --   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+        0x09, 0x03,        --   Usage (0x03)
+        0x91, 0x02,        --   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+        0xC0               -- End Collection
+]])
+            },
+            EndPoint(IN(1),  Interrupt, 64),
+            EndPoint(OUT(1), Interrupt, 64),
+       }
+   }
+}</div>
+
+<div style="display: none;" id="hid_kb" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB Boot Keyboard DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "KB",
+    Config {
+        USB_HID{
+            isBoot = true, -- same as bInterfaceSubClass = 1
+            isKey = true,  -- same as bInterfaceProtocol = 1
+            report = HID_BootKeyBoard(),
+            EndPoint(IN(1),  Interrupt, 8),
+            EndPoint(OUT(1), Interrupt, 8),
+       }
+   }
+}</div>
+
+<div style="display: none;" id="hid_mouse" >return Device {
+    strManufacturer = "TeenyUSB",
+    strProduct = "TeenyUSB Boot Mouse DEMO",
+    strSerial = "TUSB123456",
+    idVendor = 0x0483,
+    idProduct = 0x0011,
+    prefix = "MOUSE",
+    Config {
+        USB_HID{
+            isBoot = true,   -- same as bInterfaceSubClass = 1
+            isMouse = true,  -- same as bInterfaceProtocol = 2
+            extDesc = HID_BootMouse(), -- same as report = xxx
+            EndPoint(IN(1),  Interrupt, 8),
+            EndPoint(OUT(1), Interrupt, 8),
+       }
+   }
+}</div>
+
 </body>
 </html>
