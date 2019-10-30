@@ -134,7 +134,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
 <p>
 
 <br><br>
-<p><a href="https://github.com/teenydt/teenydt.github.io/blob/master/sample_desc/README.md#add-sample">Add sample</a></p>
+<p><a href="https://github.com/teenydt/teenydt.github.io/blob/master/sample_desc/readme.md#add-sample">Add sample</a></p>
 <br><br>
 
 <button id="idTeenyC" onClick="toTeenyC();">TeenyUSB C</button>
@@ -369,7 +369,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
             sampleDesc[t.File] = { Desc:t.Description };
             sel.options[i] = new Option(t.Description, t.File);
             getText("sample_desc/"+t.File+".lua", function(content){
-                sampleDesc[t.file].content = content;
+                sampleDesc[t.File].content = content;
             })
         }        
     }
