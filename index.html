@@ -157,7 +157,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
 <select id="theme" onchange="changeTheme();"><optgroup label="Bright"><option value="ace/theme/chrome">Chrome</option><option value="ace/theme/clouds">Clouds</option><option value="ace/theme/crimson_editor">Crimson Editor</option><option value="ace/theme/dawn">Dawn</option><option value="ace/theme/dreamweaver">Dreamweaver</option><option value="ace/theme/eclipse">Eclipse</option><option value="ace/theme/github">GitHub</option><option value="ace/theme/iplastic">IPlastic</option><option value="ace/theme/solarized_light">Solarized Light</option><option value="ace/theme/textmate">TextMate</option><option value="ace/theme/tomorrow">Tomorrow</option><option value="ace/theme/xcode">XCode</option><option value="ace/theme/kuroir">Kuroir</option><option value="ace/theme/katzenmilch">KatzenMilch</option><option value="ace/theme/sqlserver">SQL Server</option></optgroup><optgroup label="Dark"><option value="ace/theme/ambiance">Ambiance</option><option value="ace/theme/chaos">Chaos</option><option value="ace/theme/clouds_midnight">Clouds Midnight</option><option value="ace/theme/dracula">Dracula</option><option value="ace/theme/cobalt">Cobalt</option><option value="ace/theme/gruvbox">Gruvbox</option><option value="ace/theme/gob">Green on Black</option><option value="ace/theme/idle_fingers">idle Fingers</option><option value="ace/theme/kr_theme">krTheme</option><option value="ace/theme/merbivore">Merbivore</option><option value="ace/theme/merbivore_soft">Merbivore Soft</option><option value="ace/theme/mono_industrial">Mono Industrial</option><option value="ace/theme/monokai">Monokai</option><option value="ace/theme/pastel_on_dark">Pastel on dark</option><option value="ace/theme/solarized_dark">Solarized Dark</option><option value="ace/theme/terminal">Terminal</option><option value="ace/theme/tomorrow_night">Tomorrow Night</option><option value="ace/theme/tomorrow_night_blue">Tomorrow Night Blue</option><option value="ace/theme/tomorrow_night_bright">Tomorrow Night Bright</option><option value="ace/theme/tomorrow_night_eighties">Tomorrow Night 80s</option><option value="ace/theme/twilight">Twilight</option><option value="ace/theme/vibrant_ink">Vibrant Ink</option></optgroup></select>
 </p>
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 </td>
 
@@ -323,7 +323,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         var t = document.getElementById("exampleDesc").value;
         if(sampleDesc[t]){
             if(sampleDesc[t].content){
-                luaEditor.setValue( e.innerHTML );
+                luaEditor.setValue( sampleDesc[t].content );
                 luaEditor.clearSelection();
                 if(lastAction){
                     lastAction();
@@ -337,7 +337,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
     }
     
     
-    function getText(url, action){
+    function getText(url, action, param){
         var xmlhttp;
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
@@ -348,19 +348,22 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
             if (xmlhttp.readyState == XMLHttpRequest.DONE ) 
             {
                if(xmlhttp.status == 200){
-                   action(xmlhttp.responseText);
+                   action(xmlhttp.responseText, param);
                }
                else {
-                   console.log("Fail to load sample descriptor")
+                   console.log("Fail to load sample descriptor at " + url);
                }
             }
         }
         xmlhttp.open("GET", url, true);
-        xmlhttp.send("file");
+        xmlhttp.send();
     }
     
-    function parseDescriptor(desc){
-   
+    function parseDescContent(content, name){
+        sampleDesc[name].content = content;
+    }
+    
+    function parseDescriptor(desc, name){
         var sel = document.getElementById("exampleDesc")
         var res = desc.match(/\{\s*File\s*\=\s*\"([^\"]+)\"\s*,\s*Description\s*\=\s*\"([^\"]+)\"[\s,]*\}/g)
         for(var i=0; i<res.length;i++){
@@ -368,12 +371,10 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
             t = JSON.parse(t);
             sampleDesc[t.File] = { Desc:t.Description };
             sel.options[i] = new Option(t.Description, t.File);
-            getText("sample_desc/"+t.File+".lua", function(content){
-                sampleDesc[t.File].content = content;
-            })
+            getText("sample_desc/"+t.File+".lua", parseDescContent, t.File);
         }        
     }
-    getText("sample_desc/descriptor.lua", parseDescriptor)
+    getText("sample_desc/descriptor.lua", parseDescriptor, "desc")
     
 </script>
 
