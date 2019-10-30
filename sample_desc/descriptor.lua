@@ -16,7 +16,6 @@ local desc_list = {
     { File = "daplinkv1_desc",     Description = "DAPLink V1"       },
     { File = "daplinkv2_desc",     Description = "DAPLink V2"       },
     { File = "multi_config_desc",  Description = "Multi Config"     },
-    { File = "multi_config_desc",  Description = "Multi Config"     },
     { File = "simplest_desc",      Description = "Simplest"         },
 }
 
