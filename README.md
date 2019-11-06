@@ -1,8 +1,8 @@
 TeenyDT
 =============
-使用lua开发的USB描述符生成工具。生成的描述符可以用在[TeenyUSB](https://github.com/xtoolbox/TeenyUSB)协议栈和[libopencm3](https://github.com/libopencm3/libopencm3)的USB协议栈，[在线试用](http://dt.tusb.org)。
+使用lua开发的USB描述符生成工具。生成的描述符可以用在[TeenyUSB](https://github.com/xtoolbox/TeenyUSB)协议栈和[libopencm3](https://github.com/libopencm3/libopencm3)的USB协议栈，在线试用[线路1](http://dt.tusb.org)，[线路2](http://dt1.tusb.org)。
 
-lua based USB descriptor generator for TeenyUSB and LibOpenCM3, [Try it online](http://dt.tusb.org).
+lua based USB descriptor generator for TeenyUSB and LibOpenCM3, Try it online, [Site1](http://dt.tusb.org), [Site2](http://dt1.tusb.org).
 
 需要[lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)，require [lua5.3](https://sourceforge.net/projects/luabinaries/files/5.3.4/)
 
