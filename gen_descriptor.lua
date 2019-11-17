@@ -68,7 +68,7 @@ function MakeHeader(outFile, inFile, body)
  * Date   :  $(DATE)
 
  * Desc   :  This file is auto generate by the TeenyDT
- *           Visit https://github.com/xtoolbox/TeenyDT for more info
+ *           Visit http://dt.tusb.org for more info
  */
 
 /*
