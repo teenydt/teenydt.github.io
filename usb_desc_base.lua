@@ -250,18 +250,27 @@ end
 function StringDescriptor(str)
     local varData = {}
     local i = 1
-    while i<=#str do
-        if str:byte(i)>0x7f and i<#str then
+    if utf8.len(str) then
+        for p,c in utf8.codes(str) do
             varData[#varData+1] = {
-                ["wcChar"..(i-1)] = str:byte(i) | (str:byte(i+1)<<8)
+                ["wcChar"..(i-1)] = c
             }
             i = i + 1
-        else
-            varData[#varData+1] = {
-                ["wcChar"..(i-1)] = str:byte(i)
-            }
         end
-        i = i + 1
+    else
+        while i<=#str do
+            if str:byte(i)>0x7f and i<#str then
+                varData[#varData+1] = {
+                    ["wcChar"..(i-1)] = str:byte(i) | (str:byte(i+1)<<8)
+                }
+                i = i + 1
+            else
+                varData[#varData+1] = {
+                    ["wcChar"..(i-1)] = str:byte(i)
+                }
+            end
+            i = i + 1
+        end
     end
     local desc = CreateDescriptor({
         {bLength              = DUMMY                        },
