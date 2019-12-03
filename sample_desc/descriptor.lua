@@ -7,6 +7,7 @@ local desc_list = {
     { File = "composite_desc",     Description = "Composite"        },
     { File = "cdc_acm_desc",       Description = "CDC ACM"          },
     { File = "cdc_acm5_desc",      Description = "CDC ACM5"         },
+    { File = "cdc_rndis_desc",     Description = "CDC RNDIS"        },
     { File = "winusb_desc",        Description = "WinUSB"           },
     { File = "winusb20_desc",      Description = "WinUSB20"         },
     { File = "hid_user_desc",      Description = "User HID"         },

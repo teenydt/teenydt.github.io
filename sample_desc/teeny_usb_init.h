@@ -1,10 +1,10 @@
 /*
  * Name   :  teeny_usb_init.h
  * Author :  admin@xtoolbox.org
- * Date   :  2019-10-30 12:13:58
+ * Date   :  2019-12-03 11:20:36
 
  * Desc   :  This file is auto generate by the TeenyDT
- *           Visit https://github.com/xtoolbox/TeenyDT for more info
+ *           Visit http://dt.tusb.org for more info
  */
 
 /*
@@ -21,6 +21,7 @@ local desc_list = {
     { File = "composite_desc",     Description = "Composite"        },
     { File = "cdc_acm_desc",       Description = "CDC ACM"          },
     { File = "cdc_acm5_desc",      Description = "CDC ACM5"         },
+    { File = "cdc_rndis_desc",     Description = "CDC RNDIS"        },
     { File = "winusb_desc",        Description = "WinUSB"           },
     { File = "winusb20_desc",      Description = "WinUSB20"         },
     { File = "hid_user_desc",      Description = "User HID"         },
@@ -30,7 +31,6 @@ local desc_list = {
     { File = "daplinkv1_desc",     Description = "DAPLink V1"       },
     { File = "daplinkv2_desc",     Description = "DAPLink V2"       },
     { File = "multi_config_desc",  Description = "Multi Config"     },
-    { File = "multi_config_desc",  Description = "Multi Config"     },
     { File = "simplest_desc",      Description = "Simplest"         },
 }
 
@@ -39,9 +39,7 @@ for i,v in ipairs(desc_list) do
     descriptors[#descriptors+1] = require(v.File)
 end
 
-
 return descriptors
-
 
 
   ------------- lua script end   ------------
@@ -952,6 +950,281 @@ extern const tusb_descriptors CDC_ACM5_descriptors;
 /////////////////////////////////////////
 //// Device 3
 /////////////////////////////////////////
+#ifndef __CDC_RNDIS_TEENY_USB_INIT_H__
+#define __CDC_RNDIS_TEENY_USB_INIT_H__
+// forward declare the tusb_descriptors struct
+typedef struct _tusb_descriptors tusb_descriptors;
+
+#define CDC_RNDIS_VID                                            0x0483
+#define CDC_RNDIS_PID                                            0x0011
+#define CDC_RNDIS_STRING_COUNT                                   (4)
+
+// device.bmAttributes & 0x40   USB_CONFIG_SELF_POWERED
+// device.bmAttributes & 0x20   USB_CONFIG_REMOTE_WAKEUP
+#define CDC_RNDIS_DEV_STATUS                                    (0 | 0)
+
+
+// Endpoint usage:
+#define CDC_RNDIS_MAX_EP                                         (3)
+#define CDC_RNDIS_EP_NUM                                         (CDC_RNDIS_MAX_EP + 1)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 FS Core
+///////////////////////////////////////////////
+
+#ifdef CDC_RNDIS_BTABLE_ADDRESS
+#undef CDC_RNDIS_BTABLE_ADDRESS
+#endif
+#define CDC_RNDIS_BTABLE_ADDRESS                                 (0)
+#define CDC_RNDIS_EP_BUF_DESC_TABLE_SIZE                         (8)
+// PMA buffer reserved for buffer description table
+#define CDC_RNDIS_USB_BUF_START                                  (CDC_RNDIS_EP_BUF_DESC_TABLE_SIZE * CDC_RNDIS_EP_NUM)
+
+// EndPoints 0 defines
+#define CDC_RNDIS_EP0_RX_SIZE                                    (64)
+#define CDC_RNDIS_EP0_RX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (0))
+#define CDC_RNDIS_EP0_TX_SIZE                                    (64)
+#define CDC_RNDIS_EP0_TX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (64))
+#define CDC_RNDIS_EP0_RX_TYPE                                    USB_EP_CONTROL
+#define CDC_RNDIS_EP0_TX_TYPE                                    USB_EP_CONTROL
+
+#define CDC_RNDIS_EP0_TYPE                                       USB_EP_CONTROL
+#define CDC_RNDIS_EP0_TX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (0))
+#define CDC_RNDIS_EP0_TX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (64))
+#define CDC_RNDIS_EP0_RX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (0))
+#define CDC_RNDIS_EP0_RX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (64))
+
+// EndPoints 1 defines
+#define CDC_RNDIS_EP1_RX_SIZE                                    (64)
+#define CDC_RNDIS_EP1_RX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (128))
+#define CDC_RNDIS_EP1_TX_SIZE                                    (64)
+#define CDC_RNDIS_EP1_TX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (192))
+#define CDC_RNDIS_EP1_RX_TYPE                                    USB_EP_BULK
+#define CDC_RNDIS_EP1_TX_TYPE                                    USB_EP_BULK
+
+#define CDC_RNDIS_EP1_TYPE                                       USB_EP_BULK
+#define CDC_RNDIS_EP1_TX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (128))
+#define CDC_RNDIS_EP1_TX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (192))
+#define CDC_RNDIS_EP1_RX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (128))
+#define CDC_RNDIS_EP1_RX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (192))
+
+// EndPoints 2 defines
+#define CDC_RNDIS_EP2_RX_SIZE                                    (0)
+#define CDC_RNDIS_EP2_RX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP2_TX_SIZE                                    (0)
+#define CDC_RNDIS_EP2_TX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP2_RX_TYPE                                    USB_EP_Invalid
+#define CDC_RNDIS_EP2_TX_TYPE                                    USB_EP_Invalid
+
+#define CDC_RNDIS_EP2_TYPE                                       USB_EP_Invalid
+#define CDC_RNDIS_EP2_TX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP2_TX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP2_RX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP2_RX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+
+// EndPoints 3 defines
+#define CDC_RNDIS_EP3_RX_SIZE                                    (0)
+#define CDC_RNDIS_EP3_RX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP3_TX_SIZE                                    (16)
+#define CDC_RNDIS_EP3_TX_ADDR                                    (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP3_RX_TYPE                                    USB_EP_Invalid
+#define CDC_RNDIS_EP3_TX_TYPE                                    USB_EP_INTERRUPT
+
+#define CDC_RNDIS_EP3_TYPE                                       USB_EP_INTERRUPT
+#define CDC_RNDIS_EP3_TX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP3_TX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (272))
+#define CDC_RNDIS_EP3_RX0_ADDR                                   (CDC_RNDIS_USB_BUF_START + (256))
+#define CDC_RNDIS_EP3_RX1_ADDR                                   (CDC_RNDIS_USB_BUF_START + (272))
+
+
+// EndPoint max packed sizes
+extern const uint8_t CDC_RNDIS_txEpMaxSize[];
+#define CDC_RNDIS_TXEP_MAX_SIZE                                  \
+const uint8_t CDC_RNDIS_txEpMaxSize[] = \
+{ CDC_RNDIS_EP0_TX_SIZE, CDC_RNDIS_EP1_TX_SIZE, 0, CDC_RNDIS_EP3_TX_SIZE,  };
+extern const uint8_t CDC_RNDIS_rxEpMaxSize[];
+#define CDC_RNDIS_RXEP_MAX_SIZE                                  \
+const uint8_t CDC_RNDIS_rxEpMaxSize[] = \
+{ CDC_RNDIS_EP0_RX_SIZE, CDC_RNDIS_EP1_RX_SIZE, 0, 0,  };
+
+// EndPoints init function for USB FS core
+#define CDC_RNDIS_TUSB_INIT_EP_FS(dev) \
+  do{\
+    /* Init ep0 */ \
+    INIT_EP_BiDirection(dev, PCD_ENDP0, CDC_RNDIS_EP0_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP0, CDC_RNDIS_EP0_TX_ADDR);  \
+    SET_RX_ADDR(dev, PCD_ENDP0, CDC_RNDIS_EP0_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP0, CDC_RNDIS_EP0_RX_SIZE);  \
+    /* Init ep1 */ \
+    INIT_EP_BiDirection(dev, PCD_ENDP1, CDC_RNDIS_EP1_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP1, CDC_RNDIS_EP1_TX_ADDR);  \
+    SET_RX_ADDR(dev, PCD_ENDP1, CDC_RNDIS_EP1_RX_ADDR);  \
+    SET_RX_CNT(dev, PCD_ENDP1, CDC_RNDIS_EP1_RX_SIZE);  \
+    /* Init ep2 */ \
+    /* Init ep3 */ \
+    INIT_EP_TxOnly(dev, PCD_ENDP3, CDC_RNDIS_EP3_TYPE);  \
+    SET_TX_ADDR(dev, PCD_ENDP3, CDC_RNDIS_EP3_TX_ADDR);  \
+}while(0)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG Core
+///////////////////////////////////////////////
+#define CDC_RNDIS_OTG_MAX_OUT_SIZE                               (64)
+#define CDC_RNDIS_OTG_CONTROL_EP_NUM                             (1)
+#define CDC_RNDIS_OTG_OUT_EP_NUM                                 (1)
+// RX FIFO size / 4 > (CONTROL_EP_NUM * 5 + 8) +  (MAX_OUT_SIZE / 4 + 1) + (OUT_EP_NUM*2) + 1 = 33
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG FS Core
+///////////////////////////////////////////////
+#define CDC_RNDIS_OTG_RX_FIFO_SIZE_FS                            (256)
+#define CDC_RNDIS_OTG_RX_FIFO_ADDR_FS                            (0)
+// Sum of IN ep max packet size is 144
+// Remain Fifo size is 1024 in bytes, Rx Used 256 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define CDC_RNDIS_EP0_TX_FIFO_ADDR_FS                            (256)
+#define CDC_RNDIS_EP0_TX_FIFO_SIZE_FS                            (CDC_RNDIS_EP0_TX_SIZE * 7)
+#define CDC_RNDIS_EP1_TX_FIFO_ADDR_FS                            (704)
+#define CDC_RNDIS_EP1_TX_FIFO_SIZE_FS                            (CDC_RNDIS_EP1_TX_SIZE * 7)
+#define CDC_RNDIS_EP3_TX_FIFO_ADDR_FS                            (1152)
+#define CDC_RNDIS_EP3_TX_FIFO_SIZE_FS                            (CDC_RNDIS_EP3_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_FS)
+#define CDC_RNDIS_TUSB_INIT_EP_OTG_FS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_FS) { \
+      SET_RX_FIFO(dev, CDC_RNDIS_OTG_RX_FIFO_ADDR_FS, CDC_RNDIS_OTG_RX_FIFO_SIZE_FS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, CDC_RNDIS_EP0_TX_TYPE, CDC_RNDIS_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, CDC_RNDIS_EP0_TX_FIFO_ADDR_FS, CDC_RNDIS_EP0_TX_FIFO_SIZE_FS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, CDC_RNDIS_EP0_RX_TYPE, CDC_RNDIS_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Tx(dev, PCD_ENDP1, CDC_RNDIS_EP1_TX_TYPE, CDC_RNDIS_EP1_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP1, CDC_RNDIS_EP1_TX_FIFO_ADDR_FS, CDC_RNDIS_EP1_TX_FIFO_SIZE_FS);  \
+      INIT_EP_Rx(dev, PCD_ENDP1, CDC_RNDIS_EP1_RX_TYPE, CDC_RNDIS_EP1_RX_SIZE); \
+      /* Init Ep3  */\
+      INIT_EP_Tx(dev, PCD_ENDP3, CDC_RNDIS_EP3_TX_TYPE, CDC_RNDIS_EP3_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP3, CDC_RNDIS_EP3_TX_FIFO_ADDR_FS, CDC_RNDIS_EP3_TX_FIFO_SIZE_FS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_FS)
+#define CDC_RNDIS_TUSB_INIT_EP_OTG_FS(dev) 
+    
+#endif  // #if defined(USB_OTG_FS)
+
+///////////////////////////////////////////////
+//// Endpoint define for STM32 OTG HS Core
+///////////////////////////////////////////////
+#define CDC_RNDIS_OTG_RX_FIFO_SIZE_HS                            (512)
+#define CDC_RNDIS_OTG_RX_FIFO_ADDR_HS                            (0)
+// Sum of IN ep max packet size is 144
+// Remain Fifo size is 3584 in bytes, Rx Used 512 bytes 
+
+// TODO:
+// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
+// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
+#define CDC_RNDIS_EP0_TX_FIFO_ADDR_HS                            (512)
+#define CDC_RNDIS_EP0_TX_FIFO_SIZE_HS                            (CDC_RNDIS_EP0_TX_SIZE * 7)
+#define CDC_RNDIS_EP1_TX_FIFO_ADDR_HS                            (960)
+#define CDC_RNDIS_EP1_TX_FIFO_SIZE_HS                            (CDC_RNDIS_EP1_TX_SIZE * 7)
+#define CDC_RNDIS_EP3_TX_FIFO_ADDR_HS                            (1408)
+#define CDC_RNDIS_EP3_TX_FIFO_SIZE_HS                            (CDC_RNDIS_EP3_TX_SIZE * 7)
+// EndPoints init function for USB OTG core
+#if defined(USB_OTG_HS)
+#define CDC_RNDIS_TUSB_INIT_EP_OTG_HS(dev) \
+  do{\
+    if(GetUSB(dev) == USB_OTG_HS) { \
+      SET_RX_FIFO(dev, CDC_RNDIS_OTG_RX_FIFO_ADDR_HS, CDC_RNDIS_OTG_RX_FIFO_SIZE_HS);  \
+      /* Init Ep0  */\
+      INIT_EP_Tx(dev, PCD_ENDP0, CDC_RNDIS_EP0_TX_TYPE, CDC_RNDIS_EP0_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP0, CDC_RNDIS_EP0_TX_FIFO_ADDR_HS, CDC_RNDIS_EP0_TX_FIFO_SIZE_HS);  \
+      INIT_EP_Rx(dev, PCD_ENDP0, CDC_RNDIS_EP0_RX_TYPE, CDC_RNDIS_EP0_RX_SIZE); \
+      /* Init Ep1  */\
+      INIT_EP_Tx(dev, PCD_ENDP1, CDC_RNDIS_EP1_TX_TYPE, CDC_RNDIS_EP1_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP1, CDC_RNDIS_EP1_TX_FIFO_ADDR_HS, CDC_RNDIS_EP1_TX_FIFO_SIZE_HS);  \
+      INIT_EP_Rx(dev, PCD_ENDP1, CDC_RNDIS_EP1_RX_TYPE, CDC_RNDIS_EP1_RX_SIZE); \
+      /* Init Ep3  */\
+      INIT_EP_Tx(dev, PCD_ENDP3, CDC_RNDIS_EP3_TX_TYPE, CDC_RNDIS_EP3_TX_SIZE);  \
+      SET_TX_FIFO(dev, PCD_ENDP3, CDC_RNDIS_EP3_TX_FIFO_ADDR_HS, CDC_RNDIS_EP3_TX_FIFO_SIZE_HS);  \
+    }\
+  }while(0)
+
+#else  // #if defined(USB_OTG_HS)
+#define CDC_RNDIS_TUSB_INIT_EP_OTG_HS(dev) 
+    
+#endif  // #if defined(USB_OTG_HS)
+#define CDC_RNDIS_TUSB_INIT_EP_OTG(dev) \
+  do{\
+    CDC_RNDIS_TUSB_INIT_EP_OTG_FS(dev); \
+    CDC_RNDIS_TUSB_INIT_EP_OTG_HS(dev); \
+  }while(0)
+
+
+#if defined(USB)
+#define CDC_RNDIS_TUSB_INIT_EP(dev) CDC_RNDIS_TUSB_INIT_EP_FS(dev)
+
+// Teeny USB device init function for FS core
+#define CDC_RNDIS_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = CDC_RNDIS_DEV_STATUS;         \
+    dev->rx_max_size = CDC_RNDIS_rxEpMaxSize;         \
+    dev->tx_max_size = CDC_RNDIS_txEpMaxSize;         \
+    dev->descriptors = &CDC_RNDIS_descriptors;         \
+  }while(0)
+
+#endif
+
+#if defined(USB_OTG_FS) || defined(USB_OTG_HS)
+#define CDC_RNDIS_TUSB_INIT_EP(dev) CDC_RNDIS_TUSB_INIT_EP_OTG(dev)
+
+// Teeny USB device init function for OTG core
+#define CDC_RNDIS_TUSB_INIT_DEVICE(dev) \
+  do{\
+    /* Init device features */       \
+    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
+    dev->status = CDC_RNDIS_DEV_STATUS;         \
+    dev->descriptors = &CDC_RNDIS_descriptors;         \
+  }while(0)
+
+#endif
+
+#define CDC_RNDIS_TUSB_INIT(dev) \
+  do{\
+    CDC_RNDIS_TUSB_INIT_EP(dev);   \
+    CDC_RNDIS_TUSB_INIT_DEVICE(dev);   \
+  }while(0)
+
+// Get End Point count
+#ifndef  EP_NUM
+#define  EP_NUM 1
+#endif
+#if CDC_RNDIS_EP_NUM > EP_NUM
+#undef   EP_NUM
+#define  EP_NUM  CDC_RNDIS_EP_NUM
+#endif
+
+extern const uint8_t* const CDC_RNDIS_StringDescriptors[CDC_RNDIS_STRING_COUNT];
+extern const tusb_descriptors CDC_RNDIS_descriptors;
+
+// Enable WCID related code
+#define  HAS_WCID
+
+#ifndef WCID_VENDOR_CODE
+#define  WCID_VENDOR_CODE       0x17
+extern const uint8_t WCID_StringDescriptor_MSOS[];
+#endif
+
+
+#endif   // #ifndef __CDC_RNDIS_TEENY_USB_INIT_H__
+/////////////////////////////////////////
+//// Device 4
+/////////////////////////////////////////
 #ifndef __WINUSB_TEENY_USB_INIT_H__
 #define __WINUSB_TEENY_USB_INIT_H__
 // forward declare the tusb_descriptors struct
@@ -1245,7 +1518,7 @@ extern const uint8_t WCID_StringDescriptor_MSOS[];
 
 #endif   // #ifndef __WINUSB_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 4
+//// Device 5
 /////////////////////////////////////////
 #ifndef __WINUSB20_TEENY_USB_INIT_H__
 #define __WINUSB20_TEENY_USB_INIT_H__
@@ -1540,7 +1813,7 @@ extern const uint8_t WCID_StringDescriptor_MSOS[];
 
 #endif   // #ifndef __WINUSB20_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 5
+//// Device 6
 /////////////////////////////////////////
 #ifndef __USER_HID_TEENY_USB_INIT_H__
 #define __USER_HID_TEENY_USB_INIT_H__
@@ -1768,7 +2041,7 @@ extern const uint8_t USER_HID_ReportDescriptor_if0[USER_HID_REPORT_DESCRIPTOR_SI
 
 #endif   // #ifndef __USER_HID_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 6
+//// Device 7
 /////////////////////////////////////////
 #ifndef __KB_TEENY_USB_INIT_H__
 #define __KB_TEENY_USB_INIT_H__
@@ -1996,7 +2269,7 @@ extern const uint8_t KB_ReportDescriptor_if0[KB_REPORT_DESCRIPTOR_SIZE_IF0];
 
 #endif   // #ifndef __KB_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 7
+//// Device 8
 /////////////////////////////////////////
 #ifndef __MOUSE_TEENY_USB_INIT_H__
 #define __MOUSE_TEENY_USB_INIT_H__
@@ -2224,7 +2497,7 @@ extern const uint8_t MOUSE_ReportDescriptor_if0[MOUSE_REPORT_DESCRIPTOR_SIZE_IF0
 
 #endif   // #ifndef __MOUSE_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 8
+//// Device 9
 /////////////////////////////////////////
 #ifndef __MSC_TEENY_USB_INIT_H__
 #define __MSC_TEENY_USB_INIT_H__
@@ -2471,7 +2744,7 @@ extern const tusb_descriptors MSC_descriptors;
 
 #endif   // #ifndef __MSC_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 9
+//// Device 10
 /////////////////////////////////////////
 #ifndef __DAPV1_TEENY_USB_INIT_H__
 #define __DAPV1_TEENY_USB_INIT_H__
@@ -2717,7 +2990,7 @@ extern const uint8_t DAPV1_ReportDescriptor_if0[DAPV1_REPORT_DESCRIPTOR_SIZE_IF0
 
 #endif   // #ifndef __DAPV1_TEENY_USB_INIT_H__
 /////////////////////////////////////////
-//// Device 10
+//// Device 11
 /////////////////////////////////////////
 #ifndef __DAPV2_TEENY_USB_INIT_H__
 #define __DAPV2_TEENY_USB_INIT_H__
@@ -2967,338 +3240,6 @@ extern const uint8_t WCID_StringDescriptor_MSOS[];
 
 
 #endif   // #ifndef __DAPV2_TEENY_USB_INIT_H__
-/////////////////////////////////////////
-//// Device 11
-/////////////////////////////////////////
-#ifndef __MULCFG_TEENY_USB_INIT_H__
-#define __MULCFG_TEENY_USB_INIT_H__
-// forward declare the tusb_descriptors struct
-typedef struct _tusb_descriptors tusb_descriptors;
-
-#define MULCFG_VID                                            0x0483
-#define MULCFG_PID                                            0x0011
-#define MULCFG_STRING_COUNT                                   (5)
-
-// device.bmAttributes & 0x40   USB_CONFIG_SELF_POWERED
-// device.bmAttributes & 0x20   USB_CONFIG_REMOTE_WAKEUP
-#define MULCFG_DEV_STATUS                                    (0 | 0)
-
-
-// Endpoint usage:
-#define MULCFG_MAX_EP                                         (4)
-#define MULCFG_EP_NUM                                         (MULCFG_MAX_EP + 1)
-
-///////////////////////////////////////////////
-//// Endpoint define for STM32 FS Core
-///////////////////////////////////////////////
-
-#ifdef MULCFG_BTABLE_ADDRESS
-#undef MULCFG_BTABLE_ADDRESS
-#endif
-#define MULCFG_BTABLE_ADDRESS                                 (0)
-#define MULCFG_EP_BUF_DESC_TABLE_SIZE                         (8)
-// PMA buffer reserved for buffer description table
-#define MULCFG_USB_BUF_START                                  (MULCFG_EP_BUF_DESC_TABLE_SIZE * MULCFG_EP_NUM)
-
-// EndPoints 0 defines
-#define MULCFG_EP0_RX_SIZE                                    (64)
-#define MULCFG_EP0_RX_ADDR                                    (MULCFG_USB_BUF_START + (0))
-#define MULCFG_EP0_TX_SIZE                                    (64)
-#define MULCFG_EP0_TX_ADDR                                    (MULCFG_USB_BUF_START + (64))
-#define MULCFG_EP0_RX_TYPE                                    USB_EP_CONTROL
-#define MULCFG_EP0_TX_TYPE                                    USB_EP_CONTROL
-
-#define MULCFG_EP0_TYPE                                       USB_EP_CONTROL
-#define MULCFG_EP0_TX0_ADDR                                   (MULCFG_USB_BUF_START + (0))
-#define MULCFG_EP0_TX1_ADDR                                   (MULCFG_USB_BUF_START + (64))
-#define MULCFG_EP0_RX0_ADDR                                   (MULCFG_USB_BUF_START + (0))
-#define MULCFG_EP0_RX1_ADDR                                   (MULCFG_USB_BUF_START + (64))
-
-// EndPoints 1 defines
-#define MULCFG_EP1_RX_SIZE                                    (32)
-#define MULCFG_EP1_RX_ADDR                                    (MULCFG_USB_BUF_START + (128))
-#define MULCFG_EP1_TX_SIZE                                    (32)
-#define MULCFG_EP1_TX_ADDR                                    (MULCFG_USB_BUF_START + (160))
-#define MULCFG_EP1_RX_TYPE                                    USB_EP_BULK
-#define MULCFG_EP1_TX_TYPE                                    USB_EP_BULK
-
-#define MULCFG_EP1_TYPE                                       USB_EP_BULK
-#define MULCFG_EP1_TX0_ADDR                                   (MULCFG_USB_BUF_START + (128))
-#define MULCFG_EP1_TX1_ADDR                                   (MULCFG_USB_BUF_START + (160))
-#define MULCFG_EP1_RX0_ADDR                                   (MULCFG_USB_BUF_START + (128))
-#define MULCFG_EP1_RX1_ADDR                                   (MULCFG_USB_BUF_START + (160))
-
-// EndPoints 2 defines
-#define MULCFG_EP2_RX_SIZE                                    (64)
-#define MULCFG_EP2_RX_ADDR                                    (MULCFG_USB_BUF_START + (192))
-#define MULCFG_EP2_TX_SIZE                                    (64)
-#define MULCFG_EP2_TX_ADDR                                    (MULCFG_USB_BUF_START + (256))
-#define MULCFG_EP2_RX_TYPE                                    USB_EP_BULK
-#define MULCFG_EP2_TX_TYPE                                    USB_EP_BULK
-
-#define MULCFG_EP2_TYPE                                       USB_EP_BULK
-#define MULCFG_EP2_TX0_ADDR                                   (MULCFG_USB_BUF_START + (192))
-#define MULCFG_EP2_TX1_ADDR                                   (MULCFG_USB_BUF_START + (256))
-#define MULCFG_EP2_RX0_ADDR                                   (MULCFG_USB_BUF_START + (192))
-#define MULCFG_EP2_RX1_ADDR                                   (MULCFG_USB_BUF_START + (256))
-
-// EndPoints 3 defines
-#define MULCFG_EP3_RX_SIZE                                    (16)
-#define MULCFG_EP3_RX_ADDR                                    (MULCFG_USB_BUF_START + (320))
-#define MULCFG_EP3_TX_SIZE                                    (16)
-#define MULCFG_EP3_TX_ADDR                                    (MULCFG_USB_BUF_START + (336))
-#define MULCFG_EP3_RX_TYPE                                    USB_EP_INTERRUPT
-#define MULCFG_EP3_TX_TYPE                                    USB_EP_INTERRUPT
-
-#define MULCFG_EP3_TYPE                                       USB_EP_INTERRUPT
-#define MULCFG_EP3_TX0_ADDR                                   (MULCFG_USB_BUF_START + (320))
-#define MULCFG_EP3_TX1_ADDR                                   (MULCFG_USB_BUF_START + (336))
-#define MULCFG_EP3_RX0_ADDR                                   (MULCFG_USB_BUF_START + (320))
-#define MULCFG_EP3_RX1_ADDR                                   (MULCFG_USB_BUF_START + (336))
-
-// EndPoints 4 defines
-#define MULCFG_EP4_RX_SIZE                                    (64)
-#define MULCFG_EP4_RX_ADDR                                    (MULCFG_USB_BUF_START + (352))
-#define MULCFG_EP4_TX_SIZE                                    (64)
-#define MULCFG_EP4_TX_ADDR                                    (MULCFG_USB_BUF_START + (416))
-#define MULCFG_EP4_RX_TYPE                                    USB_EP_BULK
-#define MULCFG_EP4_TX_TYPE                                    USB_EP_BULK
-
-#define MULCFG_EP4_TYPE                                       USB_EP_BULK
-#define MULCFG_EP4_TX0_ADDR                                   (MULCFG_USB_BUF_START + (352))
-#define MULCFG_EP4_TX1_ADDR                                   (MULCFG_USB_BUF_START + (416))
-#define MULCFG_EP4_RX0_ADDR                                   (MULCFG_USB_BUF_START + (352))
-#define MULCFG_EP4_RX1_ADDR                                   (MULCFG_USB_BUF_START + (416))
-
-
-// EndPoint max packed sizes
-extern const uint8_t MULCFG_txEpMaxSize[];
-#define MULCFG_TXEP_MAX_SIZE                                  \
-const uint8_t MULCFG_txEpMaxSize[] = \
-{ MULCFG_EP0_TX_SIZE, MULCFG_EP1_TX_SIZE, MULCFG_EP2_TX_SIZE, MULCFG_EP3_TX_SIZE, MULCFG_EP4_TX_SIZE,  };
-extern const uint8_t MULCFG_rxEpMaxSize[];
-#define MULCFG_RXEP_MAX_SIZE                                  \
-const uint8_t MULCFG_rxEpMaxSize[] = \
-{ MULCFG_EP0_RX_SIZE, MULCFG_EP1_RX_SIZE, MULCFG_EP2_RX_SIZE, MULCFG_EP3_RX_SIZE, MULCFG_EP4_RX_SIZE,  };
-
-// EndPoints init function for USB FS core
-#define MULCFG_TUSB_INIT_EP_FS(dev) \
-  do{\
-    /* Init ep0 */ \
-    INIT_EP_BiDirection(dev, PCD_ENDP0, MULCFG_EP0_TYPE);  \
-    SET_TX_ADDR(dev, PCD_ENDP0, MULCFG_EP0_TX_ADDR);  \
-    SET_RX_ADDR(dev, PCD_ENDP0, MULCFG_EP0_RX_ADDR);  \
-    SET_RX_CNT(dev, PCD_ENDP0, MULCFG_EP0_RX_SIZE);  \
-    /* Init ep1 */ \
-    INIT_EP_BiDirection(dev, PCD_ENDP1, MULCFG_EP1_TYPE);  \
-    SET_TX_ADDR(dev, PCD_ENDP1, MULCFG_EP1_TX_ADDR);  \
-    SET_RX_ADDR(dev, PCD_ENDP1, MULCFG_EP1_RX_ADDR);  \
-    SET_RX_CNT(dev, PCD_ENDP1, MULCFG_EP1_RX_SIZE);  \
-    /* Init ep2 */ \
-    INIT_EP_BiDirection(dev, PCD_ENDP2, MULCFG_EP2_TYPE);  \
-    SET_TX_ADDR(dev, PCD_ENDP2, MULCFG_EP2_TX_ADDR);  \
-    SET_RX_ADDR(dev, PCD_ENDP2, MULCFG_EP2_RX_ADDR);  \
-    SET_RX_CNT(dev, PCD_ENDP2, MULCFG_EP2_RX_SIZE);  \
-    /* Init ep3 */ \
-    INIT_EP_BiDirection(dev, PCD_ENDP3, MULCFG_EP3_TYPE);  \
-    SET_TX_ADDR(dev, PCD_ENDP3, MULCFG_EP3_TX_ADDR);  \
-    SET_RX_ADDR(dev, PCD_ENDP3, MULCFG_EP3_RX_ADDR);  \
-    SET_RX_CNT(dev, PCD_ENDP3, MULCFG_EP3_RX_SIZE);  \
-    /* Init ep4 */ \
-    INIT_EP_BiDirection(dev, PCD_ENDP4, MULCFG_EP4_TYPE);  \
-    SET_TX_ADDR(dev, PCD_ENDP4, MULCFG_EP4_TX_ADDR);  \
-    SET_RX_ADDR(dev, PCD_ENDP4, MULCFG_EP4_RX_ADDR);  \
-    SET_RX_CNT(dev, PCD_ENDP4, MULCFG_EP4_RX_SIZE);  \
-}while(0)
-
-///////////////////////////////////////////////
-//// Endpoint define for STM32 OTG Core
-///////////////////////////////////////////////
-#define MULCFG_OTG_MAX_OUT_SIZE                               (64)
-#define MULCFG_OTG_CONTROL_EP_NUM                             (1)
-#define MULCFG_OTG_OUT_EP_NUM                                 (4)
-// RX FIFO size / 4 > (CONTROL_EP_NUM * 5 + 8) +  (MAX_OUT_SIZE / 4 + 1) + (OUT_EP_NUM*2) + 1 = 39
-
-///////////////////////////////////////////////
-//// Endpoint define for STM32 OTG FS Core
-///////////////////////////////////////////////
-#define MULCFG_OTG_RX_FIFO_SIZE_FS                            (256)
-#define MULCFG_OTG_RX_FIFO_ADDR_FS                            (0)
-// Sum of IN ep max packet size is 240
-// Remain Fifo size is 1024 in bytes, Rx Used 256 bytes 
-
-// TODO:
-// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
-// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
-#define MULCFG_EP0_TX_FIFO_ADDR_FS                            (256)
-#define MULCFG_EP0_TX_FIFO_SIZE_FS                            (MULCFG_EP0_TX_SIZE * 4)
-#define MULCFG_EP1_TX_FIFO_ADDR_FS                            (512)
-#define MULCFG_EP1_TX_FIFO_SIZE_FS                            (MULCFG_EP1_TX_SIZE * 4)
-#define MULCFG_EP2_TX_FIFO_ADDR_FS                            (640)
-#define MULCFG_EP2_TX_FIFO_SIZE_FS                            (MULCFG_EP2_TX_SIZE * 4)
-#define MULCFG_EP3_TX_FIFO_ADDR_FS                            (896)
-#define MULCFG_EP3_TX_FIFO_SIZE_FS                            (MULCFG_EP3_TX_SIZE * 4)
-#define MULCFG_EP4_TX_FIFO_ADDR_FS                            (960)
-#define MULCFG_EP4_TX_FIFO_SIZE_FS                            (MULCFG_EP4_TX_SIZE * 4)
-// EndPoints init function for USB OTG core
-#if defined(USB_OTG_FS)
-#define MULCFG_TUSB_INIT_EP_OTG_FS(dev) \
-  do{\
-    if(GetUSB(dev) == USB_OTG_FS) { \
-      SET_RX_FIFO(dev, MULCFG_OTG_RX_FIFO_ADDR_FS, MULCFG_OTG_RX_FIFO_SIZE_FS);  \
-      /* Init Ep0  */\
-      INIT_EP_Tx(dev, PCD_ENDP0, MULCFG_EP0_TX_TYPE, MULCFG_EP0_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP0, MULCFG_EP0_TX_FIFO_ADDR_FS, MULCFG_EP0_TX_FIFO_SIZE_FS);  \
-      INIT_EP_Rx(dev, PCD_ENDP0, MULCFG_EP0_RX_TYPE, MULCFG_EP0_RX_SIZE); \
-      /* Init Ep1  */\
-      INIT_EP_Tx(dev, PCD_ENDP1, MULCFG_EP1_TX_TYPE, MULCFG_EP1_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP1, MULCFG_EP1_TX_FIFO_ADDR_FS, MULCFG_EP1_TX_FIFO_SIZE_FS);  \
-      INIT_EP_Rx(dev, PCD_ENDP1, MULCFG_EP1_RX_TYPE, MULCFG_EP1_RX_SIZE); \
-      /* Init Ep2  */\
-      INIT_EP_Tx(dev, PCD_ENDP2, MULCFG_EP2_TX_TYPE, MULCFG_EP2_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP2, MULCFG_EP2_TX_FIFO_ADDR_FS, MULCFG_EP2_TX_FIFO_SIZE_FS);  \
-      INIT_EP_Rx(dev, PCD_ENDP2, MULCFG_EP2_RX_TYPE, MULCFG_EP2_RX_SIZE); \
-      /* Init Ep3  */\
-      INIT_EP_Tx(dev, PCD_ENDP3, MULCFG_EP3_TX_TYPE, MULCFG_EP3_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP3, MULCFG_EP3_TX_FIFO_ADDR_FS, MULCFG_EP3_TX_FIFO_SIZE_FS);  \
-      INIT_EP_Rx(dev, PCD_ENDP3, MULCFG_EP3_RX_TYPE, MULCFG_EP3_RX_SIZE); \
-      /* Init Ep4  */\
-      INIT_EP_Tx(dev, PCD_ENDP4, MULCFG_EP4_TX_TYPE, MULCFG_EP4_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP4, MULCFG_EP4_TX_FIFO_ADDR_FS, MULCFG_EP4_TX_FIFO_SIZE_FS);  \
-      INIT_EP_Rx(dev, PCD_ENDP4, MULCFG_EP4_RX_TYPE, MULCFG_EP4_RX_SIZE); \
-    }\
-  }while(0)
-
-#else  // #if defined(USB_OTG_FS)
-#define MULCFG_TUSB_INIT_EP_OTG_FS(dev) 
-    
-#endif  // #if defined(USB_OTG_FS)
-
-///////////////////////////////////////////////
-//// Endpoint define for STM32 OTG HS Core
-///////////////////////////////////////////////
-#define MULCFG_OTG_RX_FIFO_SIZE_HS                            (512)
-#define MULCFG_OTG_RX_FIFO_ADDR_HS                            (0)
-// Sum of IN ep max packet size is 240
-// Remain Fifo size is 3584 in bytes, Rx Used 512 bytes 
-
-// TODO:
-// I don't know why the max count of TX fifo should <= (7 * EpMaxPacket)
-// But it seems the STM32F7xx can be large than (7 * EpMaxPacket)
-#define MULCFG_EP0_TX_FIFO_ADDR_HS                            (512)
-#define MULCFG_EP0_TX_FIFO_SIZE_HS                            (MULCFG_EP0_TX_SIZE * 7)
-#define MULCFG_EP1_TX_FIFO_ADDR_HS                            (960)
-#define MULCFG_EP1_TX_FIFO_SIZE_HS                            (MULCFG_EP1_TX_SIZE * 7)
-#define MULCFG_EP2_TX_FIFO_ADDR_HS                            (1184)
-#define MULCFG_EP2_TX_FIFO_SIZE_HS                            (MULCFG_EP2_TX_SIZE * 7)
-#define MULCFG_EP3_TX_FIFO_ADDR_HS                            (1632)
-#define MULCFG_EP3_TX_FIFO_SIZE_HS                            (MULCFG_EP3_TX_SIZE * 7)
-#define MULCFG_EP4_TX_FIFO_ADDR_HS                            (1744)
-#define MULCFG_EP4_TX_FIFO_SIZE_HS                            (MULCFG_EP4_TX_SIZE * 7)
-// EndPoints init function for USB OTG core
-#if defined(USB_OTG_HS)
-#define MULCFG_TUSB_INIT_EP_OTG_HS(dev) \
-  do{\
-    if(GetUSB(dev) == USB_OTG_HS) { \
-      SET_RX_FIFO(dev, MULCFG_OTG_RX_FIFO_ADDR_HS, MULCFG_OTG_RX_FIFO_SIZE_HS);  \
-      /* Init Ep0  */\
-      INIT_EP_Tx(dev, PCD_ENDP0, MULCFG_EP0_TX_TYPE, MULCFG_EP0_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP0, MULCFG_EP0_TX_FIFO_ADDR_HS, MULCFG_EP0_TX_FIFO_SIZE_HS);  \
-      INIT_EP_Rx(dev, PCD_ENDP0, MULCFG_EP0_RX_TYPE, MULCFG_EP0_RX_SIZE); \
-      /* Init Ep1  */\
-      INIT_EP_Tx(dev, PCD_ENDP1, MULCFG_EP1_TX_TYPE, MULCFG_EP1_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP1, MULCFG_EP1_TX_FIFO_ADDR_HS, MULCFG_EP1_TX_FIFO_SIZE_HS);  \
-      INIT_EP_Rx(dev, PCD_ENDP1, MULCFG_EP1_RX_TYPE, MULCFG_EP1_RX_SIZE); \
-      /* Init Ep2  */\
-      INIT_EP_Tx(dev, PCD_ENDP2, MULCFG_EP2_TX_TYPE, MULCFG_EP2_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP2, MULCFG_EP2_TX_FIFO_ADDR_HS, MULCFG_EP2_TX_FIFO_SIZE_HS);  \
-      INIT_EP_Rx(dev, PCD_ENDP2, MULCFG_EP2_RX_TYPE, MULCFG_EP2_RX_SIZE); \
-      /* Init Ep3  */\
-      INIT_EP_Tx(dev, PCD_ENDP3, MULCFG_EP3_TX_TYPE, MULCFG_EP3_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP3, MULCFG_EP3_TX_FIFO_ADDR_HS, MULCFG_EP3_TX_FIFO_SIZE_HS);  \
-      INIT_EP_Rx(dev, PCD_ENDP3, MULCFG_EP3_RX_TYPE, MULCFG_EP3_RX_SIZE); \
-      /* Init Ep4  */\
-      INIT_EP_Tx(dev, PCD_ENDP4, MULCFG_EP4_TX_TYPE, MULCFG_EP4_TX_SIZE);  \
-      SET_TX_FIFO(dev, PCD_ENDP4, MULCFG_EP4_TX_FIFO_ADDR_HS, MULCFG_EP4_TX_FIFO_SIZE_HS);  \
-      INIT_EP_Rx(dev, PCD_ENDP4, MULCFG_EP4_RX_TYPE, MULCFG_EP4_RX_SIZE); \
-    }\
-  }while(0)
-
-#else  // #if defined(USB_OTG_HS)
-#define MULCFG_TUSB_INIT_EP_OTG_HS(dev) 
-    
-#endif  // #if defined(USB_OTG_HS)
-#define MULCFG_TUSB_INIT_EP_OTG(dev) \
-  do{\
-    MULCFG_TUSB_INIT_EP_OTG_FS(dev); \
-    MULCFG_TUSB_INIT_EP_OTG_HS(dev); \
-  }while(0)
-
-
-#if defined(USB)
-#define MULCFG_TUSB_INIT_EP(dev) MULCFG_TUSB_INIT_EP_FS(dev)
-
-// Teeny USB device init function for FS core
-#define MULCFG_TUSB_INIT_DEVICE(dev) \
-  do{\
-    /* Init device features */       \
-    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
-    dev->status = MULCFG_DEV_STATUS;         \
-    dev->rx_max_size = MULCFG_rxEpMaxSize;         \
-    dev->tx_max_size = MULCFG_txEpMaxSize;         \
-    dev->descriptors = &MULCFG_descriptors;         \
-  }while(0)
-
-#endif
-
-#if defined(USB_OTG_FS) || defined(USB_OTG_HS)
-#define MULCFG_TUSB_INIT_EP(dev) MULCFG_TUSB_INIT_EP_OTG(dev)
-
-// Teeny USB device init function for OTG core
-#define MULCFG_TUSB_INIT_DEVICE(dev) \
-  do{\
-    /* Init device features */       \
-    memset(&dev->addr, 0, TUSB_DEVICE_SIZE);    \
-    dev->status = MULCFG_DEV_STATUS;         \
-    dev->descriptors = &MULCFG_descriptors;         \
-  }while(0)
-
-#endif
-
-#define MULCFG_TUSB_INIT(dev) \
-  do{\
-    MULCFG_TUSB_INIT_EP(dev);   \
-    MULCFG_TUSB_INIT_DEVICE(dev);   \
-  }while(0)
-
-// Get End Point count
-#ifndef  EP_NUM
-#define  EP_NUM 1
-#endif
-#if MULCFG_EP_NUM > EP_NUM
-#undef   EP_NUM
-#define  EP_NUM  MULCFG_EP_NUM
-#endif
-
-extern const uint8_t* const MULCFG_StringDescriptors[MULCFG_STRING_COUNT];
-extern const tusb_descriptors MULCFG_descriptors;
-
-#define MULCFG_REPORT_DESCRIPTOR_SIZE_IF0  (24)
-extern const uint8_t MULCFG_ReportDescriptor_if0[MULCFG_REPORT_DESCRIPTOR_SIZE_IF0];
-
-#define MULCFG_REPORT_DESCRIPTOR_SIZE_IF2  (24)
-extern const uint8_t MULCFG_ReportDescriptor_if2[MULCFG_REPORT_DESCRIPTOR_SIZE_IF2];
-
-// Enable WCID related code
-#define  HAS_WCID
-
-#ifndef WCID_VENDOR_CODE
-#define  WCID_VENDOR_CODE       0x17
-extern const uint8_t WCID_StringDescriptor_MSOS[];
-#endif
-
-
-#endif   // #ifndef __MULCFG_TEENY_USB_INIT_H__
 /////////////////////////////////////////
 //// Device 12
 /////////////////////////////////////////
