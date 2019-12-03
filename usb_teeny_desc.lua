@@ -439,7 +439,7 @@ extern const tusb_descriptors $(PREFIX)descriptors;
 ]])
     local hasWCID = false
     for i,v in ipairs(dev.extDesc) do
-        if v.type == "WinUSB" then
+        if isWCID(v) then
             hasWCID = true
         elseif v.handler then
             r = r .. v.handler(dev, v, true)

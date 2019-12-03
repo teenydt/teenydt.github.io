@@ -171,12 +171,24 @@ function OutputWinUSB20Info(dev)
                     WCID20CompatibleID("WINUSB"),
                     WCID20RegValue("DeviceInterfaceGUIDs", {v.data}),
                 }
+            elseif v.type == "RNDIS" then
+                data[#data+1] = WCID20FunctionSubset{
+                    interface = v.interface.content.bInterfaceNumber,
+                    WCID20CompatibleID("RNDIS"),
+                }
             end
         else
-            data = {
-                WCID20CompatibleID("WINUSB"),
-                WCID20RegValue("DeviceInterfaceGUIDs", {v.data}),
-            }
+            if v.type == "RNDIS" then
+                data = {
+                    WCID20CompatibleID("RNDIS"),
+                }
+
+            else
+                data = {
+                    WCID20CompatibleID("WINUSB"),
+                    WCID20RegValue("DeviceInterfaceGUIDs", {v.data}),
+                }
+            end
         end
     end
     local set = WCID20DescriptorSet(data)

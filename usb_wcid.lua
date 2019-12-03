@@ -169,10 +169,14 @@ function WCIDProperty(param)
      return desc
 end
 
+function isWCID(v)
+     return v.type == "WinUSB" or v.type == "RNDIS"
+end
+
 function MakeWinUSB(dev, extDesc)
      local min = 0xff
      for i,v in ipairs(dev.extDesc) do
-          if v.type == "WinUSB" and v.interface.content.bInterfaceNumber < min then
+          if isWCID(v) and v.interface.content.bInterfaceNumber < min then
                min = v.interface.content.bInterfaceNumber
           end
      end
@@ -195,13 +199,20 @@ function WinUSB(guid)
      }
 end
 
+function RNDIS()
+    return {
+          type = "RNDIS",
+          handler = MakeWinUSB,
+     }
+end
+
 function GetWinUSBInterface(dev)
      local r = {}
      for i=1,dev.children[1].content.bNumInterfaces do
           r[i] = {}
      end
      for i,v in ipairs(dev.extDesc) do
-          if v.type == "WinUSB" then
+          if isWCID(v) then
                r[v.interface.content.bInterfaceNumber + 1] = v
           end
      end
@@ -248,6 +259,9 @@ WEAK __ALIGN_BEGIN const uint8_t $(PREFIX)IF$(ID)_WCIDProperties [$(SIZE)] __ALI
 $(BODY)};
 ]])
                properties = properties .. genCode({ID = (i-1),}, "$(PREFIX)IF$(ID)_WCIDProperties,\n")
+          elseif v.type == "RNDIS" then
+               funcs[#funcs+1] = WCIDFunction(v.interface.content.bInterfaceNumber, "RNDIS")
+               properties = properties .. "0,    // No WCID in Interface " ..(i-1) .."\n"
           else
                properties = properties .. "0,    // No WCID in Interface " ..(i-1) .."\n"
           end

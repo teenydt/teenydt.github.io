@@ -48,9 +48,10 @@ function CDC_ACM(param)
     assert(WriteEp.content.bmAttributes == Bulk, TAG .. "Data write endpoint type must be Bulk")
     assert((WriteEp.content.bEndpointAddress & 0x80) == 0x00, TAG .. "Data write endpoint direction must be out")
     Ctrl = Interface{
-        bInterfaceClass = 2,
-        bInterfaceSubClass = 2,
-        bInterfaceProtocol = 1,
+        bInterfaceClass = param.bInterfaceClass or 2,
+        bInterfaceSubClass = param.bInterfaceSubClass or 2,
+        bInterfaceProtocol = param.bInterfaceProtocol or 1,
+        extDesc = param.extDesc,
         Function{   bDescriptorSubtype = 0,
                     name = "cdc acm header descriptor",
                     varData = {
@@ -67,7 +68,7 @@ function CDC_ACM(param)
         Function{   bDescriptorSubtype = 2,
                     name = "cdc acm descriptor",
                     varData = {
-                        {bmCapabilities = 0x02},
+                        {bmCapabilities = param.bmCapabilities or 0x02},
                     }
                 },
         Function{   bDescriptorSubtype = 6,

@@ -433,7 +433,7 @@ function Generate_LibOpenCM3_header(dev, maxEp, maxMem)
     local extDefine = ""
     local hasWCID = false
     for i,v in ipairs(dev.extDesc) do
-        if v.type == "WinUSB" then
+        if isWCID(v) then
             hasWCID = true
         elseif v.handler then
             extDefine = extDefine .. v.handler(dev, v, true)
