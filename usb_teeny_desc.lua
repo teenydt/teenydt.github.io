@@ -323,7 +323,7 @@ function Generate_TeenyUSB_header(dev, maxEp, maxMem)
     local r = ""
     local pwr = (dev.children[1].content.bmAttributes & 0x40) ~= 0 
     pwr = pwr and "USB_CONFIG_SELF_POWERED" or "0"
-    local rmt = (dev.children[1].content.bmAttributes & 0x40) ~= 0 
+    local rmt = (dev.children[1].content.bmAttributes & 0x20) ~= 0 
     rmt = rmt and "USB_CONFIG_REMOTE_WAKEUP" or "0"
     r = r .. genCode({
         VID = string.format("0x%04x", dev.content.idVendor),
