@@ -199,10 +199,11 @@ function WinUSB(guid)
      }
 end
 
-function RNDIS()
+function RNDIS(subCID)
     return {
           type = "RNDIS",
           handler = MakeWinUSB,
+          subCID = subCID,
      }
 end
 
@@ -260,7 +261,7 @@ $(BODY)};
 ]])
                properties = properties .. genCode({ID = (i-1),}, "$(PREFIX)IF$(ID)_WCIDProperties,\n")
           elseif v.type == "RNDIS" then
-               funcs[#funcs+1] = WCIDFunction(v.interface.content.bInterfaceNumber, "RNDIS")
+               funcs[#funcs+1] = WCIDFunction(v.interface.content.bInterfaceNumber, "RNDIS", v.subCID)
                properties = properties .. "0,    // No WCID in Interface " ..(i-1) .."\n"
           else
                properties = properties .. "0,    // No WCID in Interface " ..(i-1) .."\n"

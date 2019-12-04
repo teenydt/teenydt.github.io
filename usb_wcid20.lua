@@ -174,13 +174,13 @@ function OutputWinUSB20Info(dev)
             elseif v.type == "RNDIS" then
                 data[#data+1] = WCID20FunctionSubset{
                     interface = v.interface.content.bInterfaceNumber,
-                    WCID20CompatibleID("RNDIS"),
+                    WCID20CompatibleID("RNDIS", v.subCID),
                 }
             end
         else
             if v.type == "RNDIS" then
                 data = {
-                    WCID20CompatibleID("RNDIS"),
+                    WCID20CompatibleID("RNDIS", v.subCID),
                 }
 
             else

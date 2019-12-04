@@ -8,7 +8,7 @@ return Device {
     Config {
         CDC_ACM{
                 bInterfaceProtocol = 0xff,
-                extDesc = RNDIS(),
+                extDesc = RNDIS("5162001"),
                 EndPoint(IN(3),  Interrupt, 16),
                 EndPoint(IN(1), BulkDouble, 64),
                 EndPoint(OUT(1),  BulkDouble, 64),
