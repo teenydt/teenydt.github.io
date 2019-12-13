@@ -81,18 +81,18 @@ return Device {
 |------------------|------------|--------------|
 |STM32F0xx_FS      |   7  |  1024   |
 |STM32F10x_FS      |   7  |  512    |
-|STM32F10x_OTG_FS  |   4  |  1280   |
-|STM32F2xx_OTG_FS  |   4  |  1280   |
-|STM32F2xx_OTG_HS  |   6  |  4096   |
+|STM32F10x_OTG_FS  |   3  |  1280   |
+|STM32F2xx_OTG_FS  |   3  |  1280   |
+|STM32F2xx_OTG_HS  |   5  |  4096   |
 |STM32F303_BC_FS   |   7  |  512    |
 |STM32F373x_FS     |   7  |  512    |
 |STM32F303_DE_FS   |   7  |  1024   |
-|STM32F4xx_OTG_FS  |   4  |  1280   |
-|STM32F4xx_OTG_HS  |   6  |  4096   |
-|STM32F7xx_OTG_FS  |   6  |  1280   |
-|STM32F7xx_OTG_HS  |   9  |  4096   |
-|STM32H7xx_OTG_FS  |   9  |  1280   |
-|STM32H7xx_OTG_HS  |   9  |  4096   |
+|STM32F4xx_OTG_FS  |   3  |  1280   |
+|STM32F4xx_OTG_HS  |   5  |  4096   |
+|STM32F7xx_OTG_FS  |   5  |  1280   |
+|STM32F7xx_OTG_HS  |   8  |  4096   |
+|STM32H7xx_OTG_FS  |   8  |  1280   |
+|STM32H7xx_OTG_HS  |   8  |  4096   |
 
 
 
