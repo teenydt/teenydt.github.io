@@ -256,7 +256,7 @@ How to use the descriptor? <a href="https://github.com/xtoolbox/TeenyUSB/tree/ma
         lastAction = toTeenyC;
     }
     function toTeenyH(){
-        document.getElementById("fileName").value = "teeny_usb_init.h";
+        document.getElementById("fileName").value = "teeny_usb_desc.h";
         var param = ',' + document.getElementById("MaxEp").value + ',' + document.getElementById("MaxMem").value
         clearLog();
         cEditor.setValue( fengari.load('return gen_th([==[' + luaEditor.getValue() + ']==]'+param+')' )()  );
