@@ -74,6 +74,9 @@ function Device(param)
         end
         appendExt(desc.extDesc, v.extDesc)
     end
+    if desc.content.bcdUSB >= 0x300 then
+        desc.content.bMaxPacketSize = 9
+    end
     return desc
 end
 
@@ -132,14 +135,35 @@ function Config(param)
     return desc
 end
 
+function EndpointCompanion(param)
+    local desc = CreateDescriptor({
+        {bLength                  = DUMMY                        },
+        {bDescriptorType          = ENDPOINT_COMPANION_DESCRIPTOR_TYPE    }, 
+        {bMaxBurst                = 0x00                         }, -- assigned by the config parser
+        {bmAttributes             = 0                            },
+        {wBytesPerInterval        = 0x00                         },
+    }, param, "Endpoint Companion descriptor")
+    return desc
+end
+
 function Interface(param)
     local epCnt = 0
     local epLength = 0 
+    local newItfParam = {}
     for i,v in ipairs(param) do
         if v.content.bDescriptorType == ENDPOINT_DESCRIPTOR_TYPE then
             epCnt = epCnt + 1
         end
+        newItfParam[#newItfParam+1] = v
+        if v.content.burst then
+            newItfParam[#newItfParam+1] = EndpointCompanion{
+                bMaxBurst = v.content.burst - 1
+            }
+        end
         epLength = epLength + v.content.bLength
+    end
+    for i,v in ipairs(newItfParam) do
+        param[i] = v
     end
     local desc = CreateDescriptor({
         {bLength                  = DUMMY                        },
@@ -219,13 +243,14 @@ function OUT(ep)
     return ep & 0x7f
 end
 
-function EndPoint(param, attr, size, interval)
+function EndPoint(param, attr, size, interval, burst)
     if attr then
         return EndPoint{
             bEndpointAddress = param,
             bmAttributes = attr,
             wMaxPacketSize = size,
             bInterval = interval,
+            burst = burst
         }
     end
     
@@ -244,6 +269,7 @@ function EndPoint(param, attr, size, interval)
         {bInterval            = 1                            },
     },param , "endpoint descriptor")
     desc.content.hasDoubleBuffer = doubleBuffer
+    desc.content.burst = param.burst
     return desc
 end
 

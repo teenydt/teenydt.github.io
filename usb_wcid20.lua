@@ -59,6 +59,30 @@ function WCID20DeviceCapDescriptor(param)
     return desc
 end
 
+function USB20ExtensionCapbility(param)
+    local desc = CreateDescriptor({
+        { bLength            = DUMMY         },
+        { bDescriptorType    = 0x10          },
+        { bDevCapabilityType = 0x02          },
+        { dwAttributes       = 0x06          },
+    },param, "USB 2.0 Extension Capability Descriptor")
+    return desc
+end
+
+function SuperSpeedDeviceCapbility(param)
+    local desc = CreateDescriptor({
+        { bLength            = DUMMY         },
+        { bDescriptorType    = 0x10          },
+        { bDevCapabilityType = 0x03          },
+        { bAttributes        = 0x00          },
+        { wSpeedsSupported   = 0x0e          },
+        { bFunctionalitySupport = 0x01       },
+        { bU1DevExitLat      = 0x0a          },
+        { wU2DevExitLat      = 0x7ff         },
+    },param, "SuperSpeed Device Capability Descriptor")
+    return desc
+end
+
 function WCID20BOSDescriptor(param)
     local desc = CreateDescriptor({
         { bLength          = DUMMY               },
@@ -200,13 +224,20 @@ function OutputWinUSB20Info(dev)
 WEAK __ALIGN_BEGIN const uint8_t $(PREFIX)WCIDDescriptorSet [$(SIZE)] __ALIGN_END = {
 $(BODY)};
 ]])
-
-    local bos = WCID20BOSDescriptor{
-        WCID20DeviceCapDescriptor{
-            bVendorCode = "WCID_VENDOR_CODE",
-            wDescriptorSetTotalLength = genCode({}, "$(PREFIX)WCID_DESC_SET_SIZE")
+    local bosContent = {}
+    if dev.content.bcdUSB >= 0x300 then
+        bosContent = {
+            USB20ExtensionCapbility{},
+            SuperSpeedDeviceCapbility{},
         }
+    end
+
+    bosContent[#bosContent+1] = WCID20DeviceCapDescriptor{
+        bVendorCode = "WCID_VENDOR_CODE",
+        wDescriptorSetTotalLength = genCode({}, "$(PREFIX)WCID_DESC_SET_SIZE")
     }
+
+    local bos = WCID20BOSDescriptor(bosContent)
 
     r = r .. genCode({
         SIZE = fieldValue(bos, "wTotalLength"),

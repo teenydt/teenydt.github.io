@@ -10,6 +10,7 @@ local desc_list = {
     { File = "cdc_rndis_desc",     Description = "CDC RNDIS"        },
     { File = "winusb_desc",        Description = "WinUSB"           },
     { File = "winusb20_desc",      Description = "WinUSB20"         },
+    { File = "winusb30_desc",      Description = "WinUSB30"         },
     { File = "hid_user_desc",      Description = "User HID"         },
     { File = "hid_kb_desc",        Description = "HID Keyboard"     },
     { File = "hid_mouse_desc",     Description = "HID Mouse"        },
